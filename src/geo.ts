@@ -72,3 +72,24 @@ export class Line {
 
 /** Frame-rate independent exponential smoothing factor. */
 export const smooth = (dt: number, tau: number) => 1 - Math.exp(-dt / tau);
+
+/**
+ * Critically damped spring (stable at any frame rate, no overshoot): moves `cur` toward `target`.
+ * Returns [value, velocity]. smoothTime ≈ time to reach the target.
+ */
+export function smoothDamp(cur: number, target: number, vel: number, smoothTime: number, dt: number, maxRate = Infinity): [number, number] {
+  const omega = 2 / Math.max(1e-4, smoothTime), x = omega * dt;
+  const k = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
+  let change = cur - target;
+  const maxChange = maxRate * smoothTime;
+  change = Math.max(-maxChange, Math.min(maxChange, change));
+  const t = cur - change;
+  const temp = (vel + omega * change) * dt;
+  vel = (vel - omega * temp) * k;
+  return [t + (change + temp) * k, vel];
+}
+
+/** Local east/north meters relative to an origin (accurate within a few km). */
+export function toENU(p: LngLat, o: LngLat): [number, number] {
+  return [(p[0] - o[0]) * 111320 * Math.cos((o[1] * Math.PI) / 180), (p[1] - o[1]) * 110540];
+}

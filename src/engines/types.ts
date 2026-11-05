@@ -15,7 +15,15 @@ export interface ViewEngine {
   init(el: HTMLElement, start: LngLat): Promise<void>;
   render(pose: CameraPose, dt: number): void;
   setRoute(coords: LngLat[]): void;
-  /** Fraction 0..1 of nearby detail loaded, for the loading veil. */
+  /** True once there is something real to show. */
   ready(): boolean;
   destroy(): void;
+  /** The walker's predicted next ~24 m, so imagery can be fetched before you get there. */
+  prefetch?(path: LngLat[]): void;
+  /** 0 (lightest) .. 3 (sharpest); driven by measured frame rate so it runs well on any phone. */
+  setQuality?(level: number): void;
+  /** False when there is no imagery near the camera (Real View). */
+  coverage?(): boolean;
+  /** Real View is always at eye level; camera heights don't apply. */
+  readonly eyeLevelOnly?: boolean;
 }

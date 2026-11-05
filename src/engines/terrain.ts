@@ -8,8 +8,8 @@ import type { CameraPose, ViewEngine } from './types';
 setWorkerUrl(new URL(workerUrl, location.href).href);
 
 /**
- * No-key engine: real satellite imagery (Esri World Imagery) draped over real elevation (AWS Terrain
- * Tiles) with OpenStreetMap 3D buildings, sky and atmospheric fog. Best for hikes and scenic walks.
+ * No-key preview engine: real satellite imagery (Esri World Imagery) draped over real elevation (AWS
+ * Terrain Tiles) with sky and atmospheric fog. Only real imagery - no synthetic buildings.
  */
 export class TerrainEngine implements ViewEngine {
   readonly label = 'Satellite 3D';
@@ -31,21 +31,10 @@ export class TerrainEngine implements ViewEngine {
           tiles: ['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],
           attribution: 'Terrain © Mapzen, AWS Terrain Tiles',
         },
-        omt: { type: 'vector', url: 'https://tiles.openfreemap.org/planet', attribution: '© OpenFreeMap © OpenMapTiles © OpenStreetMap contributors' },
         route: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
       },
       layers: [
         { id: 'sat', type: 'raster', source: 'sat', paint: { 'raster-contrast': 0.06, 'raster-saturation': 0.12, 'raster-fade-duration': 150 } },
-        {
-          id: 'bld', type: 'fill-extrusion', source: 'omt', 'source-layer': 'building', minzoom: 13,
-          paint: {
-            'fill-extrusion-color': '#d8d0c2',
-            'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 8],
-            'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-            'fill-extrusion-opacity': 0.9,
-            'fill-extrusion-vertical-gradient': true,
-          },
-        },
         { id: 'route', type: 'line', source: 'route', layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': '#38bdf8', 'line-width': 5, 'line-opacity': 0.7, 'line-blur': 1.5 } },
       ],
       terrain: { source: 'dem', exaggeration: 1 },
@@ -87,6 +76,7 @@ export class TerrainEngine implements ViewEngine {
     src?.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } });
   }
 
+  setQuality(level: number) { this.map?.setPixelRatio(level >= 3 ? Math.min(window.devicePixelRatio || 1, 2) : level === 2 ? 1.5 : 1); }
   ready() { return this.loaded && this.map.areTilesLoaded(); }
   destroy() { this.map?.remove(); }
 }

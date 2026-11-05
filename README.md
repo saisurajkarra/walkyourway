@@ -7,18 +7,27 @@ Walk real places in 3D at your treadmill speed, and **choose your own way** at e
 ## How it works
 
 ```
-your speed (km/h or mph) ──► walk engine ──► camera pose ──► 3D view
-                              │  moves you along REAL OpenStreetMap streets/trails
-                              │  at every junction: ← ↑ → with street names
-                              │  ⭐ = the way along the suggested route (autopilot)
-                              ▼
-              Photoreal 3D (Google Photorealistic 3D Tiles via CesiumJS)  or
-              Satellite 3D (Esri imagery on real terrain + 3D buildings, no key)
+your speed ──► walk engine (real OpenStreetMap streets & trails, ← ↑ → choices at every junction)
+                 │  predicts the next 24 m, including which way you'll go at the next junction
+                 ▼
+             game-style camera: aims along that predicted path, corners rounded, damped spring
+             (turns start before the corner and feel the same at any speed, no jerks)
+                 │
+                 ▼
+  📷 Real View   eye-level 360° real photos (Street View imagery via Google Map Tiles API),
+                 rendered by our own WebGL engine: each pixel's ray is cast onto a street "canyon"
+                 (ground + facades) around the nearest photos and blended by distance, so you
+                 glide with real parallax like a walking video, while still free to turn anywhere
+  🌐 3D World    Google Photorealistic 3D Tiles (real photogrammetry) via CesiumJS, any height
+  🛰️ Satellite   no-key preview: real satellite imagery on real terrain
 ```
 
+Real View falls back to 3D World automatically where no street photos exist, for example deep on a trail.
+
 - **Steer:** tap ⬅/➡ to queue the next left or right, tap a junction card to pick a street, use U-turn, or switch on 🧭 Free roam and hold ⬅/➡ to steer anywhere. Keyboard and Bluetooth remotes work too: ←/→ (or PageUp/PageDown) to turn, ↓ to U-turn, space to pause.
-- **Look around:** drag the screen. Your walking direction stays the same, and the view eases back when you let go.
-- **Camera:** 🚶 Walker (1.8 m), 🏙️ Street (8 m), 🚁 Drone (30 m), 🦅 Sky (120 m).
+- **Look around 360°:** drag the screen. The view has inertia and eases back to your walking direction.
+- **Immersive:** after a few seconds of walking the controls fade away. Tap anywhere to bring them back.
+- **Any phone:** rendering quality adapts to the frame rate each device actually reaches, and the layout adapts from small phones up to tablets in portrait or landscape.
 - **Real data along the way:** Wikipedia landmarks pop up as you pass them ("on your left"). A heading-up mini map shows the real streets around you.
 - **Stats:** time, distance, pace, calories (ACSM formula using your weight) and steps (from your height). Your walk history is saved on the device.
 - **Walk anywhere:** search any place and start exploring its streets.
@@ -33,17 +42,25 @@ your speed (km/h or mph) ──► walk engine ──► camera pose ──► 3
 
 Every route is snapped to real walkable paths by the OSM foot router (`npm run routes`, see `scripts/build-routes.mjs`). To add one, add waypoints to `scripts/route-specs/*.json` and run `npm run routes`.
 
-## Turn on photoreal 3D
+## Turn on the real imagery
 
-Without a key the app uses Satellite 3D. Photoreal 3D needs **one** of these:
-
-- **Cesium ion token** (free account, no card): https://ion.cesium.com/tokens. In the token's *Allowed URLs*, restrict it to your Pages URL.
-- **Google Maps Platform key** with **Map Tiles API** enabled: https://console.cloud.google.com/google/maps-apis. Restrict it by HTTP referrer to `https://saisurajkarra.github.io/*` and set a budget alert.
+| Key | Unlocks |
+|---|---|
+| **Google Maps Platform key** with **Map Tiles API** enabled ([console](https://console.cloud.google.com/google/maps-apis)) | 📷 Real View + 🌐 3D World |
+| **Cesium ion token** (free account, no card, [ion.cesium.com/tokens](https://ion.cesium.com/tokens)) | 🌐 3D World only |
 
 You can enable it in two places:
 
-- **For every visitor:** in the repo, go to Settings → Secrets and variables → Actions and add `CESIUM_ION_TOKEN` or `GOOGLE_MAPS_API_KEY`. Then re-run the deploy workflow.
+- **For every visitor:** in the repo, go to Settings → Secrets and variables → Actions and add `GOOGLE_MAPS_API_KEY` (and/or `CESIUM_ION_TOKEN`). Then re-run the deploy workflow.
 - **For one device only:** paste the key in the app under ⚙️ Settings.
+
+Protect a public key:
+
+- Restrict it by HTTP referrer to `https://saisurajkarra.github.io/*`.
+- Limit it to the Map Tiles API.
+- Set **daily quota caps** and a budget alert. Real View loads about 16 image tiles per street photo (roughly one photo every 10 m walked).
+
+Google's attribution ("Google" + imagery copyright) is shown on screen as required.
 
 ## Publish on GitHub Pages (one time)
 
@@ -60,16 +77,16 @@ npm run dev        # http://localhost:5173 (and your LAN IP for a phone on the s
 npm run build      # type-check + production build into dist/
 ```
 
-Code map: `src/walker.ts` (movement + junction decisions), `src/graph.ts` (OSM street/trail network via Overpass), `src/engines/` (photoreal + satellite renderers), `src/main.ts` (UI).
+Code map: `src/walker.ts` (movement, junction decisions, 24 m path prediction), `src/graph.ts` (OSM street/trail network via Overpass), `src/engines/street.ts` (Real View renderer), `src/engines/photoreal.ts` (3D World), `src/engines/terrain.ts` (satellite preview), `src/main.ts` (UI + game camera).
 
 ## Data sources
 
 | Data | Source | Key needed |
 |---|---|---|
+| Eye-level 360° street photos | Google Street View imagery (Map Tiles API) | yes |
 | Photoreal 3D cities and landscapes | Google Photorealistic 3D Tiles (directly or via Cesium ion) | yes (free tier) |
 | Satellite imagery | Esri World Imagery | no |
 | Elevation | AWS Terrain Tiles (Mapzen) | no |
-| 3D buildings (satellite mode) | OpenFreeMap / OpenMapTiles | no |
 | Streets, trails, junctions, names | OpenStreetMap via Overpass API | no |
 | Route snapping | FOSSGIS OSRM foot router (build time) | no |
 | Landmarks | Wikipedia GeoSearch | no |

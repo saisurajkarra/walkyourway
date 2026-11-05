@@ -17,7 +17,7 @@ export interface Settings {
   speedKmh: number;
   weightKg: number;
   heightCm: number;
-  engine: 'auto' | 'photoreal' | 'terrain';
+  engine: 'auto' | 'street' | 'photoreal' | 'terrain';
   googleKey: string;
   ionToken: string;
 }
@@ -40,7 +40,13 @@ export const keys = () => ({
   google: settings.googleKey.trim() || (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || '',
   ion: settings.ionToken.trim() || (import.meta.env.VITE_CESIUM_ION_TOKEN as string | undefined) || '',
 });
-export const photorealAvailable = () => { const k = keys(); return !!(k.google || k.ion); };
+export type EngineKind = 'street' | 'photoreal' | 'terrain';
+/** Engines usable with the configured keys, best first. */
+export const availableEngines = (): EngineKind[] => {
+  const k = keys();
+  return [...(k.google ? ['street' as const] : []), ...(k.google || k.ion ? ['photoreal' as const] : []), 'terrain'];
+};
+export const ENGINE_LABEL: Record<EngineKind, string> = { street: '📷 Real View', photoreal: '🌐 3D World', terrain: '🛰️ Satellite' };
 
 // ---------- formatting ----------
 const MI = 1.609344;

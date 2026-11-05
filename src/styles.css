@@ -99,3 +99,29 @@ dialog label input, dialog label select { margin-top: 4px; }
   .stats { position: absolute; left: calc(var(--sl) + 10px); bottom: calc(var(--sb) + 80px); grid-template-columns: repeat(5, auto); gap: 14px; }
   #mini { width: 84px; height: 84px; }
 }
+
+/* ---------- immersive mode: after a few seconds of walking the UI melts away ---------- */
+.walk .stats, .walk .controls2, .walk .hud-top .title, .walk #mini, .walk .controls { transition: opacity .6s ease; }
+.walk.immersive .stats, .walk.immersive .controls2, .walk.immersive .hud-top .title { opacity: 0; pointer-events: none; }
+.walk.immersive .controls { opacity: .55; }
+.walk.immersive #mini { opacity: .7; }
+.walk.immersive .hud-bottom { background: none; }
+.sv-credit { position: absolute; z-index: 4; left: calc(var(--sl) + 12px); top: calc(var(--st) + 122px); font: 600 11px/1.2 system-ui, sans-serif; color: rgba(255,255,255,.85); text-shadow: 0 1px 3px rgba(0,0,0,.8); pointer-events: none; }
+#b-world { background: rgba(56,189,248,.18); border-color: rgba(56,189,248,.5); }
+
+/* ---------- any phone: small screens, big screens, landscape ---------- */
+@media (max-width: 370px) {
+  .stats .opt { display: none; }
+  .stats { grid-template-columns: repeat(4, 1fr); }
+  .stats b { font-size: 15px; }
+  .turn { width: 62px; height: 52px; }
+  .play { width: 58px; height: 58px; }
+  .round { width: 44px; height: 44px; font-size: 22px; }
+  .controls2 button, .controls2 .spd { padding: 6px 9px; font-size: 12px; }
+  #mini { width: 84px; height: 84px; }
+}
+@media (min-width: 768px) {
+  .turn { width: 92px; height: 66px; font-size: 26px; }
+  .play { width: 76px; height: 76px; }
+  #mini { width: 140px; height: 140px; }
+}

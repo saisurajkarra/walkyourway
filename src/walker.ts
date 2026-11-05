@@ -69,7 +69,7 @@ export class Walker {
   private options(node: number, incoming: number): Option[] {
     const G = this.graph, np = G.pos(node);
     const inB = bearing(this.chain(node, incoming, 15), np);
-    const auto = this.autoChoice(node, incoming);
+    const auto = this.autoCached(node, incoming);
     return G.nodes.get(node)!.edges.filter((x) => x !== incoming).map((x) => ({
       edge: x,
       angle: angDiff(inB, bearing(np, this.chain(node, x, 20))),
@@ -139,36 +139,79 @@ export class Walker {
     return this.attach(this.pos, this.heading);
   }
 
-  private arrive() {
-    const G = this.graph, node = this.to, incoming = this.edge;
+  /** Auto (route/explore) choice at a junction, cached so path prediction can run every frame. */
+  private autoMemo = new Map<string, number>();
+  private autoCached(node: number, incoming: number): number {
+    const key = `${node}:${incoming}:${this.autopilot}:${Math.round(this.progress / 40)}`;
+    let v = this.autoMemo.get(key);
+    if (v === undefined) {
+      if (this.autoMemo.size > 400) this.autoMemo.clear();
+      v = this.autoChoice(node, incoming);
+      this.autoMemo.set(key, v);
+    }
+    return v;
+  }
+
+  /** The edge the walker takes at `node` (arriving via `incoming`). Pure unless `commit`. */
+  private decide(node: number, incoming: number, commit: boolean): number {
+    const G = this.graph;
     const outs = G.nodes.get(node)!.edges.filter((x) => x !== incoming);
-    let next: number;
-    if (!outs.length) {
-      next = incoming;
-      this.onEvent('deadend', G.covers(G.pos(node), 40) ? 'Dead end, turning around' : 'Edge of loaded map, turning around');
-      if (this.autopilot === 'route') this.recent.set(incoming, performance.now());
-    } else if (outs.length === 1) next = outs[0];
-    else {
-      const auto = this.autoChoice(node, incoming);
-      next = auto;
-      let manual: number | null = null;
-      if (this.picked?.node === node && outs.includes(this.picked.edge)) manual = this.picked.edge;
-      else if (this.queued) {
-        const opts = this.options(node, incoming).filter((o) => (this.queued === 'left' ? o.angle < -30 : o.angle > 30));
-        const want = this.queued === 'left' ? -90 : 90;
-        if (opts.length) manual = opts.reduce((b, o) => (Math.abs(o.angle - want) < Math.abs(b.angle - want) ? o : b)).edge;
+    if (!outs.length) return incoming; // dead end: turn around
+    if (outs.length === 1) return outs[0];
+    const auto = this.autoCached(node, incoming);
+    let manual: number | null = null;
+    if (this.picked?.node === node && outs.includes(this.picked.edge)) manual = this.picked.edge;
+    else if (this.queued) {
+      const np = G.pos(node), inB = bearing(this.chain(node, incoming, 15), np);
+      const want = this.queued === 'left' ? -90 : 90;
+      let best = Infinity;
+      for (const x of outs) {
+        const a = angDiff(inB, bearing(np, this.chain(node, x, 20)));
+        if ((this.queued === 'left' ? a < -30 : a > 30) && Math.abs(a - want) < best) { best = Math.abs(a - want); manual = x; }
       }
+    }
+    if (commit) {
       if (manual != null) {
-        next = manual;
         this.queued = null;
         if (manual !== auto && this.autopilot === 'route') { this.autopilot = 'explore'; this.onEvent('offroute', 'Exploring your own way'); }
         this.onEvent('turn', 'Onto ' + this.E(manual).name);
       }
       this.picked = null;
     }
+    return manual ?? auto;
+  }
+
+  private arrive() {
+    const G = this.graph, node = this.to, incoming = this.edge;
+    const next = this.decide(node, incoming, true);
+    if (next === incoming) {
+      this.onEvent('deadend', G.covers(G.pos(node), 40) ? 'Dead end, turning around' : 'Edge of loaded map, turning around');
+    }
     this.recent.set(incoming, performance.now());
     this.edge = next; this.from = node; this.to = G.other(this.E(next), node); this.s = 0;
     this.jCache = null;
+  }
+
+  /**
+   * The path the walker WILL take over the next `m` meters, including the decisions it will make at
+   * upcoming junctions. The camera aims along this, so turns start early and stay smooth at any speed.
+   */
+  plan(m = 24): LngLat[] {
+    const pts: LngLat[] = [this.pos];
+    if (this.mode === 'graph') {
+      const G = this.graph;
+      let from = this.from, to = this.to, e = this.edge, s = this.s, left = m;
+      for (let guard = 0; guard < 80 && left > 0; guard++) {
+        const E = this.E(e), rem = E.len - s;
+        if (rem >= left) { pts.push(lerp(G.pos(from), G.pos(to), (s + left) / E.len)); break; }
+        pts.push(G.pos(to)); left -= rem;
+        const next = this.decide(to, e, false);
+        from = to; to = G.other(this.E(next), from); e = next; s = 0;
+      }
+    } else if (this.mode === 'line' && this.route) {
+      for (let k = 2; k <= m; k += 2) pts.push(this.route.pointAt(this.lineS + k * this.lineDir));
+    } else pts.push(destination(this.pos, this.heading + this.steer * 25, m));
+    return pts;
   }
 
   update(dt: number, speed: number) {

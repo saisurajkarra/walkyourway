@@ -58,7 +58,7 @@ export class PhotorealEngine implements ViewEngine {
 
     this.tileset = await C.createGooglePhotorealistic3DTileset(
       this.googleKey ? { key: this.googleKey, onlyUsingWithGoogleGeocoder: true } : { onlyUsingWithGoogleGeocoder: true },
-      { maximumScreenSpaceError: 8, skipLevelOfDetail: true, preloadFlightDestinations: true, cacheBytes: 768 * 1024 * 1024 },
+      { maximumScreenSpaceError: 10, skipLevelOfDetail: true, preloadFlightDestinations: true, cacheBytes: 384 * 1024 * 1024, maximumCacheOverflowBytes: 256 * 1024 * 1024 },
     );
     scene.primitives.add(this.tileset);
     viewer.camera.setView({ destination: C.Cartesian3.fromDegrees(start[0], start[1], 600), orientation: { heading: 0, pitch: C.Math.toRadians(-60), roll: 0 } });
@@ -96,6 +96,13 @@ export class PhotorealEngine implements ViewEngine {
         material: C.Color.fromCssColorString('#38bdf8').withAlpha(0.65), classificationType: C.ClassificationType.CESIUM_3D_TILE,
       },
     });
+  }
+
+  setQuality(level: number) {
+    if (!this.tileset) return;
+    this.tileset.maximumScreenSpaceError = [24, 16, 10, 6][level] ?? 10;
+    const dpr = window.devicePixelRatio || 1;
+    this.viewer.resolutionScale = Math.min(dpr, [1, 1.25, 1.75, 2][level] ?? 1.5) / dpr;
   }
 
   ready() { return !!this.tileset && !Number.isNaN(this.ground) && this.tileset.tilesLoaded; }
