@@ -426,5 +426,11 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
   requestAnimationFrame(frame);
 }
 
-home();
+// Shareable deep links: #walk=<route id> opens the filmed walk, add &mode=3d for the explorable 3D walk.
+const deep = new URLSearchParams(location.hash.slice(1)), deepRoute = ROUTES.find((r) => r.id === deep.get('walk'));
+if (deepRoute) {
+  const v = VIDEOS.get(deepRoute.id);
+  if (v && deep.get('mode') !== '3d') void startVideoWalk(app, deepRoute, v, home, (pos) => startWalk(deepRoute.name, pos, null));
+  else startWalk(deepRoute.name, deepRoute.coords[0], deepRoute);
+} else home();
 if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register('./sw.js').catch(() => {});
