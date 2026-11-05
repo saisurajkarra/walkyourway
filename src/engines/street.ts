@@ -65,8 +65,8 @@ vec4 samplePano(sampler2D t, vec2 pp, float heading, float proj, float tanh, flo
   float fx = max(cos(az) * length(d.xy), 0.02), rx = sin(az) * length(d.xy);
   vec2 uv = vec2(0.5 + rx / fx / (2.0 * tanh), 0.5 - d.z / fx / (2.0 * tanh / asp));
   float edge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
-  float a = mix(0.12, 1.0, smoothstep(-0.02, 0.03, edge));
-  return vec4(texture(t, clamp(uv, 0.0, 1.0)).rgb * mix(0.45, 1.0, a), a);
+  float alpha = mix(0.12, 1.0, smoothstep(-0.02, 0.03, edge));
+  return vec4(texture(t, clamp(uv, 0.0, 1.0)).rgb * mix(0.45, 1.0, alpha), alpha);
 }
 void main() {
   vec3 dir = normalize(fwd + vNdc.x * tanH.x * right + vNdc.y * tanH.y * up);
@@ -102,6 +102,8 @@ export class StreetEngine implements ViewEngine {
   private cur: Pano | null = null;
   private prev: Pano | null = null;
   private fade = 1;
+  private viewOff = 0;
+  private viewTan = 0;
 
   private source: 'google' | 'panoramax';
   constructor(private key: string, private mly: string, private wallRadius: number) { this.source = key ? 'google' : 'panoramax'; }
@@ -149,6 +151,10 @@ export class StreetEngine implements ViewEngine {
     this.credit = document.createElement('div');
     this.credit.className = 'sv-credit';
     el.appendChild(this.credit);
+
+    renderer.render(this.scene, this.camera);
+    const bad = renderer.info.programs?.find((x) => (x as unknown as { diagnostics?: { runnable: boolean } }).diagnostics?.runnable === false);
+    if (bad) throw new Error('Real View shader failed to compile on this device');
 
     const p = this.panos.get(first[0])!;
     await this.loadTex(p, 2);
@@ -382,7 +388,20 @@ export class StreetEngine implements ViewEngine {
     (U.w.value as THREE.Vector3).set(wv[0] / sum, wv[1] / sum, wv[2] / sum);
     if (slots[0]) this.credit.textContent = `${this.source === 'google' ? 'Google · ' : ''}${slots[0].copyright}${slots[0].date ? ' · ' + slots[0].date : ''}`;
 
-    const h = (pose.heading * Math.PI) / 180, pt = (pose.pitch * Math.PI) / 180;
+    // A regular (flat) photo only shows what its camera faced: aim and zoom the view to fit it (smoothed).
+    const aspect = this.el.clientWidth / Math.max(1, this.el.clientHeight);
+    const baseTan = Math.tan(((aspect < 1 ? 80 : 58) * Math.PI) / 360);
+    let wantOff = 0, wantTan = baseTan;
+    const f = this.cur?.flat;
+    if (f && this.cur) {
+      const diff = angDiff(pose.heading, (this.cur.heading * 180) / Math.PI);
+      if (Math.abs(diff) < 70) wantOff = diff * 0.9;
+      wantTan = Math.min(baseTan, (f.tanH / f.aspect) * 0.94, (f.tanH * 0.94) / Math.max(aspect, 1e-3));
+    }
+    const k = 1 - Math.exp(-dt / 0.5);
+    this.viewOff += angDiff(this.viewOff, wantOff) * k;
+    this.viewTan += (wantTan - this.viewTan) * k;
+    const h = ((pose.heading + this.viewOff) * Math.PI) / 180, pt = (pose.pitch * Math.PI) / 180;
     const fwd = new THREE.Vector3(Math.sin(h) * Math.cos(pt), Math.cos(h) * Math.cos(pt), Math.sin(pt));
     const right = new THREE.Vector3(Math.cos(h), -Math.sin(h), 0);
     const up = new THREE.Vector3().crossVectors(right, fwd);
@@ -390,8 +409,7 @@ export class StreetEngine implements ViewEngine {
     (U.fwd.value as THREE.Vector3).copy(fwd);
     (U.right.value as THREE.Vector3).copy(right);
     (U.up.value as THREE.Vector3).copy(up);
-    const aspect = this.el.clientWidth / Math.max(1, this.el.clientHeight);
-    const tanY = Math.tan(((aspect < 1 ? 80 : 58) * Math.PI) / 360);
+    const tanY = this.viewTan || baseTan;
     (U.tanH.value as THREE.Vector2).set(tanY * aspect, tanY);
     this.renderer.render(this.scene, this.camera);
 
