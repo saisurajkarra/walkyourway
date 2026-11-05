@@ -1,0 +1,16 @@
+{
+  "name": "WalkYourWay",
+  "short_name": "WalkYourWay",
+  "description": "Walk real cities, hikes and scenic places in 3D at your treadmill speed. Choose your way at every junction.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

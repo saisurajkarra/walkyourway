@@ -1,0 +1,29 @@
+{
+  "name": "walkyourway",
+  "version": "0.1.0",
+  "description": "Walk real places in photorealistic 3D at your treadmill speed - and choose your own way.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "routes": "node scripts/build-routes.mjs scripts/route-specs/cities.json scripts/route-specs/hikes.json scripts/route-specs/scenic.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saisurajkarra/walkyourway.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saisurajkarra/walkyourway/issues"
+  },
+  "homepage": "https://github.com/saisurajkarra/walkyourway#readme",
+  "dependencies": {
+    "maplibre-gl": "^6.16.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5"
+  },
+  "private": true,
+  "type": "module"
+}
