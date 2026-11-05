@@ -371,7 +371,13 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
     camYaw = (camYaw + 360) % 360;
   };
 
-  (window as unknown as { __wyw: unknown }).__wyw = { walker, get yaw() { return camYaw; }, get engine() { return engine; } }; // for automated tests
+  let qLock = -1;
+  // Hooks for automated screenshot tests: hold a look direction, lock render quality.
+  (window as unknown as { __wyw: unknown }).__wyw = {
+    walker, get yaw() { return camYaw; }, get engine() { return engine; },
+    look(y: number, p = 0) { lookYaw = y; lookPitch = p; lookVel = 0; dragging = y !== 0 || p !== 0; },
+    lockQuality(q: number) { qLock = q; quality = q; engine?.setQuality?.(q); },
+  };
 
   // ---- main loop ----
   let lastT = performance.now(), veilDone = false, fps = 60, lastQ = performance.now(), noCover = 0;
@@ -398,7 +404,7 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
     }
     // adapt quality to this phone's real frame rate
     if (dt > 0) fps += (1 / dt - fps) * 0.05;
-    if (t - lastQ > 2500) {
+    if (qLock < 0 && t - lastQ > 2500) {
       if (fps < 24 && quality > 0) { quality--; engine?.setQuality?.(quality); lastQ = t; }
       else if (fps > 52 && quality < 3 && t - lastQ > 8000) { quality++; engine?.setQuality?.(quality); lastQ = t; }
     }
