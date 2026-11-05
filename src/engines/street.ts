@@ -61,9 +61,11 @@ vec4 samplePano(sampler2D t, vec2 pp, float heading, float proj, float tanh, flo
     float v = 0.5 - asin(clamp(d.z, -1.0, 1.0)) / PI;
     return vec4(texture(t, vec2(u, v)).rgb, 1.0);
   }
-  // flat photo: pinhole projection; outside its frame the edge is stretched and dimmed, never black
-  float fx = max(cos(az) * length(d.xy), 0.02), rx = sin(az) * length(d.xy);
-  vec2 uv = vec2(0.5 + rx / fx / (2.0 * tanh), 0.5 - d.z / fx / (2.0 * tanh / asp));
+  // flat photo: shown undistorted through its own pinhole camera (no street-proxy reprojection, which
+  // smears a narrow photo taken metres away); forward motion comes from a gentle zoom instead.
+  float faz = atan(dir.x, dir.y) - heading;
+  float fx = max(cos(faz) * length(dir.xy), 0.02), rx = sin(faz) * length(dir.xy);
+  vec2 uv = vec2(0.5 + rx / fx / (2.0 * tanh), 0.5 - dir.z / fx / (2.0 * tanh / asp));
   float edge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
   float alpha = mix(0.12, 1.0, smoothstep(-0.02, 0.03, edge));
   return vec4(texture(t, clamp(uv, 0.0, 1.0)).rgb * mix(0.45, 1.0, alpha), alpha);
@@ -396,7 +398,10 @@ export class StreetEngine implements ViewEngine {
     if (f && this.cur) {
       const diff = angDiff(pose.heading, (this.cur.heading * 180) / Math.PI);
       wantOff = diff; // always look through the photo: a real image on screen, never stretched edges
-      wantTan = Math.min(baseTan, (f.tanH / f.aspect) * 0.94, (f.tanH * 0.94) / Math.max(aspect, 1e-3));
+      // walking forward past where the photo was taken = slowly zoom into it (hyperlapse feel)
+      const ph = this.cur.heading, along = (cx - this.cur.xy[0]) * Math.sin(ph) + (cy - this.cur.xy[1]) * Math.cos(ph);
+      const zoom = Math.max(0.9, Math.min(1.35, 1 + along / 40));
+      wantTan = Math.min(baseTan, (f.tanH / f.aspect) * 0.94, (f.tanH * 0.94) / Math.max(aspect, 1e-3)) / zoom;
     }
     const k = 1 - Math.exp(-dt / 0.5);
     this.viewOff += angDiff(this.viewOff, wantOff) * k;
