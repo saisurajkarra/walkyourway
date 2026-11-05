@@ -44,7 +44,8 @@ export type EngineKind = 'street' | 'photoreal' | 'terrain';
 /** Engines usable with the configured keys, best first. */
 export const availableEngines = (): EngineKind[] => {
   const k = keys();
-  return [...(k.google ? ['street' as const] : []), ...(k.google || k.ion ? ['photoreal' as const] : []), 'terrain'];
+  // Real View always: Google Street View with a key, otherwise free Panoramax photos (falls back if none nearby)
+  return ['street', ...(k.google || k.ion ? ['photoreal' as const] : []), 'terrain'];
 };
 export const ENGINE_LABEL: Record<EngineKind, string> = { street: '📷 Real View', photoreal: '🌐 3D World', terrain: '🛰️ Satellite' };
 

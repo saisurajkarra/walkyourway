@@ -3,8 +3,9 @@ import { angDiff, toENU, type LngLat } from '../geo';
 import type { CameraPose, ViewEngine } from './types';
 
 /**
- * REAL VIEW: eye-level walking through real 360° street photography (Google Street View imagery via
- * the official Map Tiles API), rendered by our own WebGL engine.
+ * REAL VIEW: eye-level walking through real 360° street photography, rendered by our own WebGL engine.
+ * Sources: Google Street View imagery (official Map Tiles API, needs a key) or, with no key at all,
+ * Panoramax - the open, free street-level photo commons (6K 360° photos, each with GPS + compass + time).
  *
  * How the motion stays smooth like a video instead of jumping between photos:
  * each pixel's view ray is cast against a simple "street canyon" proxy (ground plane + building walls
@@ -13,12 +14,14 @@ import type { CameraPose, ViewEngine } from './types';
  * facades, and the 2–3 nearest photos are blended by distance, so you glide continuously.
  */
 const API = 'https://tile.googleapis.com/v1';
-const MAX_SLOTS = 3;
+const PMX = 'https://api.panoramax.xyz/api';
 
 interface Pano {
   id: string; p: LngLat; xy: [number, number]; heading: number;
   w: number; h: number; tw: number; th: number; copyright: string; date: string;
   tex: THREE.CanvasTexture | null; zoom: number; loading: boolean; lastUsed: number;
+  src?: { sd: string; hd: string }; // Panoramax: whole 360° images instead of tiles
+  seq?: string; // capture sequence (one person's walk): staying on it keeps time & light consistent
 }
 
 const VERT = /* glsl */ `
@@ -83,20 +86,26 @@ export class StreetEngine implements ViewEngine {
   private ro?: ResizeObserver;
   private lastPrefetch = 0;
   private walkHeading = 0;
+  private cur: Pano | null = null;
+  private prev: Pano | null = null;
+  private fade = 1;
 
-  constructor(private key: string, private wallRadius: number) {}
+  private source: 'google' | 'panoramax';
+  constructor(private key: string, private wallRadius: number) { this.source = key ? 'google' : 'panoramax'; }
 
   private q(extra = '') { return `session=${this.session}&key=${this.key}${extra}`; }
 
   async init(el: HTMLElement, start: LngLat) {
     this.el = el; this.origin = start;
-    const r = await fetch(`${API}/createSession?key=${this.key}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mapType: 'streetview', language: navigator.language || 'en-US', region: 'US' }),
-    });
-    if (!r.ok) throw new Error(`Street imagery unavailable (${r.status})`);
-    this.session = (await r.json()).session;
-    const first = await this.lookup([start], 60);
+    if (this.source === 'google') {
+      const r = await fetch(`${API}/createSession?key=${this.key}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mapType: 'streetview', language: navigator.language || 'en-US', region: 'US' }),
+      });
+      if (!r.ok) throw new Error(`Street imagery unavailable (${r.status})`);
+      this.session = (await r.json()).session;
+    } else this.session = 'panoramax';
+    const first = await this.lookup([start], 200);
     if (!first.length) throw new Error('No street-level imagery at this spot');
 
     const renderer = (this.renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' }));
@@ -116,7 +125,7 @@ export class StreetEngine implements ViewEngine {
         p0: { value: new THREE.Vector2() }, p1: { value: new THREE.Vector2() }, p2: { value: new THREE.Vector2() },
         hd: { value: new THREE.Vector3() }, w: { value: new THREE.Vector3() },
         cam: { value: new THREE.Vector3() }, fwd: { value: new THREE.Vector3() }, right: { value: new THREE.Vector3() }, up: { value: new THREE.Vector3() },
-        tanH: { value: new THREE.Vector2() }, gnd: { value: 2.5 }, rad: { value: this.wallRadius },
+        tanH: { value: new THREE.Vector2() }, gnd: { value: this.source === 'google' ? 2.5 : 2.2 }, rad: { value: this.wallRadius },
       },
     });
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.mat);
@@ -132,8 +141,41 @@ export class StreetEngine implements ViewEngine {
     void this.loadTex(p, this.maxZoom);
   }
 
-  /** Finds photo IDs near points; fetches metadata for new ones. */
+  /** Finds photos near points (and their metadata). Returns IDs nearest-first. */
   private async lookup(points: LngLat[], radius = 20): Promise<string[]> {
+    return this.source === 'google' ? this.lookupGoogle(points, radius) : this.lookupPanoramax(points, radius);
+  }
+
+  private async lookupPanoramax(points: LngLat[], radius: number): Promise<string[]> {
+    this.lookups++;
+    try {
+      const dLat = radius / 110540, dLng = radius / (111320 * Math.cos((points[0][1] * Math.PI) / 180));
+      const lngs = points.map((p) => p[0]), lats = points.map((p) => p[1]);
+      const bbox = [Math.min(...lngs) - dLng, Math.min(...lats) - dLat, Math.max(...lngs) + dLng, Math.max(...lats) + dLat].map((v) => v.toFixed(6)).join(',');
+      const r = await fetch(`${PMX}/search?bbox=${bbox}&limit=100`);
+      if (!r.ok) return [];
+      const found: { id: string; d: number }[] = [];
+      for (const f of (await r.json()).features || []) {
+        const pr = f.properties || {};
+        if ((pr['pers:interior_orientation'] || {}).field_of_view !== 360 || !f.assets?.sd?.href) continue;
+        const p: LngLat = f.geometry.coordinates;
+        if (!this.panos.has(f.id)) {
+          const dims = (pr['pers:interior_orientation'] || {}).sensor_array_dimensions || [6000, 3000];
+          const who = (f.providers || []).map((x: { name: string }) => x.name).filter(Boolean)[0] || 'Panoramax contributors';
+          this.panos.set(f.id, {
+            id: f.id, p, xy: toENU(p, this.origin), heading: ((pr['view:azimuth'] ?? 0) * Math.PI) / 180,
+            w: dims[0], h: dims[1], tw: 0, th: 0, copyright: `Panoramax · ${who} · ${pr.license || 'open licence'}`,
+            date: (pr.datetime || '').slice(0, 7), tex: null, zoom: -1, loading: false, lastUsed: 0,
+            src: { sd: f.assets.sd.href, hd: (f.assets.hd || f.assets.sd).href }, seq: f.collection,
+          });
+        }
+        found.push({ id: f.id, d: Math.min(...points.map((q) => Math.hypot(...toENU(p, q)))) });
+      }
+      return found.sort((a, b) => a.d - b.d).map((x) => x.id);
+    } catch { return []; } finally { this.lookups--; }
+  }
+
+  private async lookupGoogle(points: LngLat[], radius: number): Promise<string[]> {
     this.lookups++;
     try {
       const r = await fetch(`${API}/streetview/panoIds?${this.q()}`, {
@@ -162,6 +204,7 @@ export class StreetEngine implements ViewEngine {
 
   /** Builds the equirectangular texture: whole sphere at `z`, sharpened forward band at max zoom. */
   private async loadTex(p: Pano, z: number) {
+    if (p.src) return this.loadWhole(p, z >= 3 ? 3 : 2);
     const zmax = Math.max(0, Math.ceil(Math.log2(p.w / p.tw)));
     const zz = Math.min(z, zmax), scale = 2 ** (zmax - zz);
     if (p.loading || p.zoom >= zz) return;
@@ -204,6 +247,28 @@ export class StreetEngine implements ViewEngine {
     } finally { p.loading = false; }
   }
 
+  /** Panoramax: one 360° JPEG per photo; sd (2048 px) first, then the 6K original scaled to 4K. */
+  private async loadWhole(p: Pano, z: number) {
+    if (p.loading || p.zoom >= z) return;
+    p.loading = true;
+    try {
+      const r = await fetch(z >= 3 ? p.src!.hd : p.src!.sd);
+      if (!r.ok) return;
+      const bmp = await createImageBitmap(await r.blob());
+      const W = Math.min(z >= 3 ? 4096 : 2048, bmp.width), H = Math.round(W / 2);
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      cv.getContext('2d')!.drawImage(bmp, 0, 0, W, H);
+      bmp.close?.();
+      const tex = new THREE.CanvasTexture(cv);
+      tex.colorSpace = THREE.NoColorSpace; tex.flipY = false; tex.generateMipmaps = false;
+      tex.minFilter = THREE.LinearFilter; tex.wrapS = THREE.RepeatWrapping;
+      const old = p.tex;
+      p.tex = tex; p.zoom = z;
+      old?.dispose();
+    } catch { /* keep the previous image */ } finally { p.loading = false; }
+  }
+
   /** Called with the walker's next ~24 m so photos are fetched before you arrive. */
   prefetch(path: LngLat[]) {
     const now = performance.now();
@@ -219,7 +284,7 @@ export class StreetEngine implements ViewEngine {
     if (pts.length) void this.lookup(pts.slice(0, 20), 18);
   }
 
-  render(pose: CameraPose) {
+  render(pose: CameraPose, dt: number) {
     if (!this.mat) return;
     this.walkHeading = pose.heading;
     const cam: LngLat = [pose.lng, pose.lat];
@@ -233,7 +298,17 @@ export class StreetEngine implements ViewEngine {
       if (p.zoom < 0) void this.loadTex(p, 2);
       else if (i < 2 && d < 20 && p.zoom < this.maxZoom) void this.loadTex(p, this.maxZoom);
     });
-    const slots = near.filter((n) => n.p.tex && n.d < 80).slice(0, MAX_SLOTS);
+    // One photo at a time (no multi-photo ghosting): stay on the current capture sequence, step to
+    // the next photo when it's clearly closer, and crossfade quickly over the step.
+    const loaded = near.filter((n) => n.p.tex && n.d < 80);
+    if (loaded.length) {
+      const cur = this.cur, curD = cur ? Math.hypot(cur.xy[0] - cx, cur.xy[1] - cy) : Infinity;
+      const score = (n: { p: Pano; d: number }) => n.d + (cur?.seq && n.p.seq && n.p.seq !== cur.seq ? 6 : 0);
+      const best = loaded.reduce((b, n) => (score(n) < score(b) ? n : b));
+      if (!cur || !cur.tex || (best.p !== cur && score(best) < curD - 1)) { this.prev = cur?.tex ? cur : null; this.cur = best.p; this.fade = this.prev ? 0 : 1; }
+    }
+    this.fade = Math.min(1, this.fade + dt / 0.45);
+    const slots = [this.cur, this.fade < 1 ? this.prev : null].filter((p): p is Pano => !!p?.tex);
     // "No coverage" only when no photo EXISTS nearby and lookups for this spot are done -
     // a photo that is still downloading keeps Real View on (the previous one stays on screen).
     const [kx, ky] = [Math.round(cx / 7), Math.round(cy / 7)];
@@ -241,15 +316,15 @@ export class StreetEngine implements ViewEngine {
     this.covered = (near[0]?.d ?? Infinity) < 30 || !looked;
     const U = this.mat.uniforms;
     const wv = [0, 0, 0];
-    slots.forEach(({ p, d }, i) => {
+    slots.forEach((p, i) => {
       U[`t${i}`].value = p.tex;
       (U[`p${i}`].value as THREE.Vector2).set(p.xy[0], p.xy[1]);
       (U.hd.value as THREE.Vector3).setComponent(i, p.heading);
-      wv[i] = 1 / (d * d * d + 0.05);
+      wv[i] = i === 0 ? this.fade : 1 - this.fade;
     });
     const sum = wv[0] + wv[1] + wv[2] || 1;
     (U.w.value as THREE.Vector3).set(wv[0] / sum, wv[1] / sum, wv[2] / sum);
-    if (slots[0]) this.credit.textContent = `Google · ${slots[0].p.copyright}${slots[0].p.date ? ' · ' + slots[0].p.date : ''}`;
+    if (slots[0]) this.credit.textContent = `${this.source === 'google' ? 'Google · ' : ''}${slots[0].copyright}${slots[0].date ? ' · ' + slots[0].date : ''}`;
 
     const h = (pose.heading * Math.PI) / 180, pt = (pose.pitch * Math.PI) / 180;
     const fwd = new THREE.Vector3(Math.sin(h) * Math.cos(pt), Math.cos(h) * Math.cos(pt), Math.sin(pt));
@@ -269,6 +344,17 @@ export class StreetEngine implements ViewEngine {
   }
 
   coverage() { return this.covered; }
+
+  /** Cheap check used while on a fallback view: are real 360° photos close to `p`? */
+  static async available(p: LngLat, key: string, radius = 40): Promise<boolean> {
+    if (key) return false; // Google: handled by the engine itself (needs a session)
+    try {
+      const dLat = radius / 110540, dLng = radius / (111320 * Math.cos((p[1] * Math.PI) / 180));
+      const r = await fetch(`${PMX}/search?bbox=${[p[0] - dLng, p[1] - dLat, p[0] + dLng, p[1] + dLat].map((v) => v.toFixed(6)).join(',')}&limit=40`);
+      const j = await r.json();
+      return (j.features || []).some((f: { properties?: Record<string, { field_of_view?: number }> }) => f.properties?.['pers:interior_orientation']?.field_of_view === 360);
+    } catch { return false; }
+  }
   setQuality(level: number) {
     this.maxZoom = level >= 2 && this.renderer.capabilities.maxTextureSize >= 4096 ? 3 : 2;
     this.pixelCap = level >= 3 ? 2 : level === 2 ? 1.5 : 1;

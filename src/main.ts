@@ -385,7 +385,8 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
   };
 
   // ---- main loop ----
-  let lastT = performance.now(), veilDone = false, fps = 60, lastQ = performance.now(), noCover = 0;
+  let lastT = performance.now(), veilDone = false, fps = 60, lastQ = performance.now(), noCover = 0, lastProbe = performance.now(), probing = false;
+  const wantStreet = (settings.engine === 'auto' || settings.engine === 'street') && !keys().google;
   const veilStart = performance.now();
   const frame = (t: number) => {
     if (!alive) return;
@@ -406,6 +407,14 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
         noCover = engine.coverage() ? 0 : noCover + dt;
         if (noCover > 4) { noCover = 0; const alt = availableEngines().find((k) => k !== 'street')!; toast(`No street photos here. Switching to ${ENGINE_LABEL[alt]}; tap 📷 to return.`); void swap(alt, cam); }
       }
+    }
+    // walked back into street-photo coverage while on a fallback view: return to Real View
+    if (wantStreet && kind !== 'street' && !swapping && !probing && t - lastProbe > 12000) {
+      lastProbe = t; probing = true;
+      void import('./engines/street').then((m) => m.StreetEngine.available(cam, keys().google)).then((ok) => {
+        probing = false;
+        if (ok && alive && kind !== 'street') { toast('📷 Real street photos here. Switching to Real View'); void swap('street', cam); }
+      });
     }
     // adapt quality to this phone's real frame rate
     if (dt > 0) fps += (1 / dt - fps) * 0.05;
