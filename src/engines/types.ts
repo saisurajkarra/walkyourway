@@ -24,6 +24,8 @@ export interface ViewEngine {
   setQuality?(level: number): void;
   /** False when there is no imagery near the camera (Real View). */
   coverage?(): boolean;
+  /** Max look-around angle (degrees) the current imagery supports. */
+  lookRange?(): number;
   /** Real View is always at eye level; camera heights don't apply. */
   readonly eyeLevelOnly?: boolean;
 }

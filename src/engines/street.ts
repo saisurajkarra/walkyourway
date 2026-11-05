@@ -362,7 +362,7 @@ export class StreetEngine implements ViewEngine {
     if (loaded.length) {
       const cur = this.cur, curD = cur ? Math.hypot(cur.xy[0] - cx, cur.xy[1] - cy) : Infinity;
       const score = (n: { p: Pano; d: number }) => n.d + (cur?.seq && n.p.seq && n.p.seq !== cur.seq ? 6 : 0)
-        + (n.p.flat ? 3 + Math.max(0, Math.abs(angDiff(pose.heading, (n.p.heading * 180) / Math.PI)) - 25) / 8 : 0);
+        + (n.p.flat ? 6 + Math.max(0, Math.abs(angDiff(pose.heading, (n.p.heading * 180) / Math.PI)) - 20) / 3 : 0);
       const best = loaded.reduce((b, n) => (score(n) < score(b) ? n : b));
       if (!cur || !cur.tex || (best.p !== cur && score(best) < curD - 1)) { this.prev = cur?.tex ? cur : null; this.cur = best.p; this.fade = this.prev ? 0 : 1; }
     }
@@ -395,7 +395,7 @@ export class StreetEngine implements ViewEngine {
     const f = this.cur?.flat;
     if (f && this.cur) {
       const diff = angDiff(pose.heading, (this.cur.heading * 180) / Math.PI);
-      if (Math.abs(diff) < 70) wantOff = diff * 0.9;
+      wantOff = diff; // always look through the photo: a real image on screen, never stretched edges
       wantTan = Math.min(baseTan, (f.tanH / f.aspect) * 0.94, (f.tanH * 0.94) / Math.max(aspect, 1e-3));
     }
     const k = 1 - Math.exp(-dt / 0.5);
@@ -418,6 +418,8 @@ export class StreetEngine implements ViewEngine {
   }
 
   coverage() { return this.covered; }
+  /** How far you may look around: 360° photos allow everything, a regular photo only its own frame. */
+  lookRange() { return this.cur?.flat ? 30 : 180; }
 
   /** Cheap check used while on a fallback view: are real 360° photos close to `p`? */
   static async available(p: LngLat, key: string, mly: string, radius = 40): Promise<boolean> {

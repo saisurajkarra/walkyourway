@@ -420,6 +420,8 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
       if (t - lastDrag < 1400) { lookYaw += lookVel * dt; lookVel *= Math.exp(-5 * dt); }
       else { [lookYaw, yawBackVel] = smoothDamp(lookYaw, 0, yawBackVel, 0.9, dt); [lookPitch, pitchBackVel] = smoothDamp(lookPitch, 0, pitchBackVel, 0.9, dt); }
     }
+    const lr = engine?.lookRange?.() ?? 180;
+    if (lr < 180) lookYaw = Math.max(-lr, Math.min(lr, lookYaw));
     if (engine && !swapping) {
       const vw = engine.eyeLevelOnly ? { agl: 1.9, pitch: -1, back: 0 } : VIEWS[viewIdx];
       engine.render({ lng: cam[0], lat: cam[1], heading: camYaw + lookYaw, pitch: vw.pitch + lookPitch, agl: vw.agl, back: vw.back }, dt);
