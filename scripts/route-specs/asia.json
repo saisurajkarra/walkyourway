@@ -1,17 +1,392 @@
 [
- {"id":"mumbai-marine-drive-queens-necklace","name":"Marine Drive: Queen's Necklace","category":"city","region":"Asia","place":"Mumbai, India","blurb":"The curving Marine Drive promenade along the Arabian Sea, from Nariman Point toward Chowpatty as the evening lights come on.","waypoints":[[72.8237,18.9256],[72.8231,18.9335],[72.8210,18.9425]]},
- {"id":"new-delhi-connaught-place-janpath","name":"Connaught Place to Janpath","category":"city","region":"Asia","place":"New Delhi, India","blurb":"Through the colonnaded ring of Connaught Place and down Janpath, one of Delhi's busiest shopping streets.","waypoints":[[77.2190,28.6315],[77.2165,28.6280],[77.2135,28.6215]]},
- {"id":"jaipur-chhoti-chaupar-hawa-mahal","name":"Chhoti Chaupar to Hawa Mahal","category":"city","region":"Asia","place":"Jaipur, India","blurb":"Through the pink-walled old city from Chhoti Chaupar's bazaars to the honeycomb facade of the Hawa Mahal.","waypoints":[[75.8238,26.9200],[75.8252,26.9228],[75.8267,26.9246],[75.8296,26.9265]]},
- {"id":"hyderabad-charminar-market","name":"Charminar and the Old City Bazaars","category":"city","region":"Asia","place":"Hyderabad, India","blurb":"Evening bazaars and street-food stalls wrapped around the four-minaret Charminar in Hyderabad's old city.","waypoints":[[78.4747,17.3616],[78.4775,17.3608],[78.4790,17.3640]]},
- {"id":"bengaluru-mg-road-church-street","name":"MG Road to Church Street","category":"city","region":"Asia","place":"Bengaluru, India","blurb":"Bengaluru's busiest boulevard, Mahatma Gandhi Road, bends into the lively bars and cafes of Church Street.","waypoints":[[77.6062,12.9756],[77.6075,12.9743],[77.6052,12.9730]]},
- {"id":"singapore-orchard-road-marina-bay","name":"Orchard Road to Marina Bay","category":"city","region":"Asia","place":"Singapore","blurb":"From the shopping avenues of Orchard Road through the civic district, ending at the waterfront of Marina Bay.","waypoints":[[103.8318,1.3044],[103.8353,1.3006],[103.8485,1.2990],[103.8556,1.2897],[103.8600,1.2840]]},
- {"id":"hong-kong-tsim-sha-tsui-promenade","name":"Tsim Sha Tsui Promenade","category":"city","region":"Asia","place":"Hong Kong","blurb":"Along the Tsim Sha Tsui harbourfront, with the skyline of Hong Kong Island across the water.","waypoints":[[114.1698,22.2945],[114.1740,22.2934],[114.1760,22.2945]]},
- {"id":"seoul-myeongdong-cheonggyecheon","name":"Myeongdong to Cheonggyecheon","category":"city","region":"Asia","place":"Seoul, South Korea","blurb":"From the neon street-food lanes of Myeongdong down to the lit-up Cheonggyecheon stream at night.","waypoints":[[126.9885,37.5620],[126.9863,37.5640],[126.9848,37.5665],[126.9840,37.5688]]},
- {"id":"bangkok-sukhumvit-asok-phra-khanong","name":"Sukhumvit Road: Asok to Phra Khanong","category":"city","region":"Asia","place":"Bangkok, Thailand","blurb":"Along Sukhumvit Road from the Asok interchange past Phrom Phong and Thong Lo toward Phra Khanong.","waypoints":[[100.5605,13.7370],[100.5693,13.7310],[100.5800,13.7245],[100.5890,13.7190]]},
- {"id":"taipei-ximending","name":"Ximending Pedestrian District","category":"city","region":"Asia","place":"Taipei, Taiwan","blurb":"Wandering the neon-lit pedestrian lanes of Ximending, Taipei's busiest shopping and youth district.","waypoints":[[121.5067,25.0425],[121.5079,25.0438],[121.5058,25.0455]]},
- {"id":"osaka-kuromon-dotonbori","name":"Kuromon Market to Dotonbori","category":"city","region":"Asia","place":"Osaka, Japan","blurb":"From the seafood stalls of Kuromon Market into the canal-side lights and signs of Dotonbori.","waypoints":[[135.5066,34.6650],[135.5040,34.6672],[135.5018,34.6686],[135.4999,34.6705]]},
- {"id":"shanghai-people-square-the-bund","name":"People's Square to The Bund","category":"city","region":"Asia","place":"Shanghai, China","blurb":"Down the pedestrian length of East Nanjing Road from People's Square to the riverside colonial facades of The Bund.","waypoints":[[121.4737,31.2300],[121.4745,31.2340],[121.4800,31.2360],[121.4870,31.2390],[121.4900,31.2410]]},
- {"id":"kuala-lumpur-bukit-bintang-petronas","name":"Bukit Bintang to the Petronas Towers","category":"city","region":"Asia","place":"Kuala Lumpur, Malaysia","blurb":"From the nightlife of Jalan Alor and Bukit Bintang to the Petronas Twin Towers at KLCC.","waypoints":[[101.7085,3.1452],[101.7106,3.1466],[101.7135,3.1490],[101.7125,3.1530],[101.7117,3.1572]]},
- {"id":"dubai-marina-walk","name":"Dubai Marina Walk","category":"city","region":"Africa & Middle East","place":"Dubai, UAE","blurb":"Along the waterfront promenade of Dubai Marina, past the towers and yachts toward JBR beach.","waypoints":[[55.1412,25.0782],[55.1388,25.0773],[55.1355,25.0790],[55.1318,25.0805]]},
- {"id":"istanbul-taksim-istiklal-galata","name":"Istiklal Avenue to Galata Tower","category":"city","region":"Africa & Middle East","place":"Istanbul, Turkey","blurb":"Down the busy Istiklal pedestrian avenue from Taksim Square to the medieval Galata Tower.","waypoints":[[28.9850,41.0369],[28.9793,41.0335],[28.9768,41.0296],[28.9741,41.0256]]}
+ {
+  "id": "mumbai-marine-drive-queens-necklace",
+  "name": "Marine Drive: Queen's Necklace",
+  "category": "city",
+  "region": "Asia",
+  "place": "Mumbai, India",
+  "blurb": "The curving Marine Drive promenade along the Arabian Sea, from Nariman Point toward Chowpatty as the evening lights come on.",
+  "waypoints": [
+   [
+    72.8237,
+    18.9256
+   ],
+   [
+    72.821,
+    18.9425
+   ]
+  ]
+ },
+ {
+  "id": "new-delhi-connaught-place-janpath",
+  "name": "Connaught Place to Janpath",
+  "category": "city",
+  "region": "Asia",
+  "place": "New Delhi, India",
+  "blurb": "Through the colonnaded ring of Connaught Place and down Janpath, one of Delhi's busiest shopping streets.",
+  "waypoints": [
+   [
+    77.219,
+    28.6315
+   ],
+   [
+    77.2165,
+    28.628
+   ],
+   [
+    77.2135,
+    28.6215
+   ]
+  ]
+ },
+ {
+  "id": "jaipur-chhoti-chaupar-hawa-mahal",
+  "name": "Chhoti Chaupar to Hawa Mahal",
+  "category": "city",
+  "region": "Asia",
+  "place": "Jaipur, India",
+  "blurb": "Through the pink-walled old city from Chhoti Chaupar's bazaars to the honeycomb facade of the Hawa Mahal.",
+  "waypoints": [
+   [
+    75.8238,
+    26.92
+   ],
+   [
+    75.8252,
+    26.9228
+   ],
+   [
+    75.8267,
+    26.9246
+   ],
+   [
+    75.8296,
+    26.9265
+   ]
+  ]
+ },
+ {
+  "id": "hyderabad-charminar-market",
+  "name": "Charminar and the Old City Bazaars",
+  "category": "city",
+  "region": "Asia",
+  "place": "Hyderabad, India",
+  "blurb": "Evening bazaars and street-food stalls wrapped around the four-minaret Charminar in Hyderabad's old city.",
+  "waypoints": [
+   [
+    78.4747,
+    17.3616
+   ],
+   [
+    78.47,
+    17.364
+   ],
+   [
+    78.465,
+    17.362
+   ]
+  ]
+ },
+ {
+  "id": "bengaluru-mg-road-church-street",
+  "name": "MG Road to Church Street",
+  "category": "city",
+  "region": "Asia",
+  "place": "Bengaluru, India",
+  "blurb": "Bengaluru's busiest boulevard, Mahatma Gandhi Road, bends into the lively bars and cafes of Church Street.",
+  "waypoints": [
+   [
+    77.6062,
+    12.9756
+   ],
+   [
+    77.6078,
+    12.9745
+   ],
+   [
+    77.6052,
+    12.973
+   ],
+   [
+    77.6,
+    12.9735
+   ]
+  ]
+ },
+ {
+  "id": "singapore-orchard-road-marina-bay",
+  "name": "Orchard Road to Marina Bay",
+  "category": "city",
+  "region": "Asia",
+  "place": "Singapore",
+  "blurb": "From the shopping avenues of Orchard Road through the civic district, ending at the waterfront of Marina Bay.",
+  "waypoints": [
+   [
+    103.8318,
+    1.3044
+   ],
+   [
+    103.8353,
+    1.3006
+   ],
+   [
+    103.8485,
+    1.299
+   ],
+   [
+    103.8556,
+    1.2897
+   ],
+   [
+    103.86,
+    1.284
+   ]
+  ]
+ },
+ {
+  "id": "hong-kong-tsim-sha-tsui-promenade",
+  "name": "Tsim Sha Tsui Promenade",
+  "category": "city",
+  "region": "Asia",
+  "place": "Hong Kong",
+  "blurb": "Along the Tsim Sha Tsui harbourfront, with the skyline of Hong Kong Island across the water.",
+  "waypoints": [
+   [
+    114.169,
+    22.2975
+   ],
+   [
+    114.1698,
+    22.2945
+   ],
+   [
+    114.174,
+    22.2934
+   ],
+   [
+    114.176,
+    22.2945
+   ],
+   [
+    114.179,
+    22.2955
+   ]
+  ]
+ },
+ {
+  "id": "seoul-myeongdong-cheonggyecheon",
+  "name": "Myeongdong to Cheonggyecheon",
+  "category": "city",
+  "region": "Asia",
+  "place": "Seoul, South Korea",
+  "blurb": "From the neon street-food lanes of Myeongdong down to the lit-up Cheonggyecheon stream at night.",
+  "waypoints": [
+   [
+    126.9885,
+    37.562
+   ],
+   [
+    126.9863,
+    37.564
+   ],
+   [
+    126.9848,
+    37.5665
+   ],
+   [
+    126.984,
+    37.5688
+   ]
+  ]
+ },
+ {
+  "id": "bangkok-sukhumvit-asok-phra-khanong",
+  "name": "Sukhumvit Road: Asok to Phra Khanong",
+  "category": "city",
+  "region": "Asia",
+  "place": "Bangkok, Thailand",
+  "blurb": "Along Sukhumvit Road from the Asok interchange past Phrom Phong and Thong Lo toward Phra Khanong.",
+  "waypoints": [
+   [
+    100.5605,
+    13.737
+   ],
+   [
+    100.5693,
+    13.731
+   ],
+   [
+    100.58,
+    13.7245
+   ],
+   [
+    100.589,
+    13.719
+   ]
+  ]
+ },
+ {
+  "id": "taipei-ximending",
+  "name": "Ximending Pedestrian District",
+  "category": "city",
+  "region": "Asia",
+  "place": "Taipei, Taiwan",
+  "blurb": "Wandering the neon-lit pedestrian lanes of Ximending, Taipei's busiest shopping and youth district.",
+  "waypoints": [
+   [
+    121.5067,
+    25.0425
+   ],
+   [
+    121.5095,
+    25.0455
+   ],
+   [
+    121.5058,
+    25.0455
+   ],
+   [
+    121.504,
+    25.043
+   ]
+  ]
+ },
+ {
+  "id": "osaka-kuromon-dotonbori",
+  "name": "Kuromon Market to Dotonbori",
+  "category": "city",
+  "region": "Asia",
+  "place": "Osaka, Japan",
+  "blurb": "From the seafood stalls of Kuromon Market into the canal-side lights and signs of Dotonbori.",
+  "waypoints": [
+   [
+    135.5066,
+    34.665
+   ],
+   [
+    135.504,
+    34.6672
+   ],
+   [
+    135.5018,
+    34.6686
+   ],
+   [
+    135.4999,
+    34.6705
+   ],
+   [
+    135.5012,
+    34.6744
+   ]
+  ]
+ },
+ {
+  "id": "shanghai-people-square-the-bund",
+  "name": "People's Square to The Bund",
+  "category": "city",
+  "region": "Asia",
+  "place": "Shanghai, China",
+  "blurb": "Down the pedestrian length of East Nanjing Road from People's Square to the riverside colonial facades of The Bund.",
+  "waypoints": [
+   [
+    121.4737,
+    31.23
+   ],
+   [
+    121.4745,
+    31.234
+   ],
+   [
+    121.48,
+    31.236
+   ],
+   [
+    121.49,
+    31.241
+   ]
+  ]
+ },
+ {
+  "id": "kuala-lumpur-bukit-bintang-petronas",
+  "name": "Bukit Bintang to the Petronas Towers",
+  "category": "city",
+  "region": "Asia",
+  "place": "Kuala Lumpur, Malaysia",
+  "blurb": "From the nightlife of Jalan Alor and Bukit Bintang to the Petronas Twin Towers at KLCC.",
+  "waypoints": [
+   [
+    101.7085,
+    3.1452
+   ],
+   [
+    101.7106,
+    3.1466
+   ],
+   [
+    101.7135,
+    3.149
+   ],
+   [
+    101.7125,
+    3.153
+   ],
+   [
+    101.7117,
+    3.1572
+   ]
+  ]
+ },
+ {
+  "id": "dubai-marina-walk",
+  "name": "Dubai Marina Walk",
+  "category": "city",
+  "region": "Africa & Middle East",
+  "place": "Dubai, UAE",
+  "blurb": "Along the waterfront promenade of Dubai Marina, past the towers and yachts toward JBR beach.",
+  "waypoints": [
+   [
+    55.1412,
+    25.0782
+   ],
+   [
+    55.1388,
+    25.0773
+   ],
+   [
+    55.1355,
+    25.079
+   ],
+   [
+    55.133,
+    25.0797
+   ]
+  ]
+ },
+ {
+  "id": "istanbul-taksim-istiklal-galata",
+  "name": "Istiklal Avenue to Galata Tower",
+  "category": "city",
+  "region": "Africa & Middle East",
+  "place": "Istanbul, Turkey",
+  "blurb": "Down the busy Istiklal pedestrian avenue from Taksim Square to the medieval Galata Tower.",
+  "waypoints": [
+   [
+    28.985,
+    41.0369
+   ],
+   [
+    28.9793,
+    41.0335
+   ],
+   [
+    28.9768,
+    41.0296
+   ],
+   [
+    28.9741,
+    41.0256
+   ]
+  ]
+ }
 ]
