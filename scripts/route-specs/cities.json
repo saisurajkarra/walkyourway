@@ -1,7 +1,136 @@
 [
-{"id":"nyc-times-square-central-park","name":"Times Square to Central Park","category":"city","place":"New York, USA","blurb":"Neon canyons of Times Square give way to Bryant Park's lawns and the grand sweep of Fifth Avenue toward Central Park.","waypoints":[[-73.9855,40.7580],[-73.9835,40.7537],[-73.9806,40.7530],[-73.9790,40.7587],[-73.9739,40.7644]]},
-{"id":"paris-louvre-seine-eiffel","name":"Louvre to the Eiffel Tower","category":"city","place":"Paris, France","blurb":"Walk from the Louvre along the Seine quays and bridges, with the Eiffel Tower rising ahead as the river bends west.","waypoints":[[2.3376,48.8606],[2.3375,48.8584],[2.3136,48.8638],[2.29531,48.85789]]},
-{"id":"london-westminster-tower-bridge","name":"Westminster to Tower Bridge","category":"city","place":"London, UK","blurb":"Cross Westminster Bridge, follow the South Bank past the Thames riverside, and finish at the iconic Tower Bridge.","waypoints":[[-0.1226,51.5008],[-0.1160,51.5058],[-0.0900,51.5040],[-0.0770,51.5045],[-0.0754,51.5055]]},
-{"id":"tokyo-shibuya-harajuku-omotesando","name":"Shibuya to Omotesando","category":"city","place":"Tokyo, Japan","blurb":"From the chaos of Shibuya Crossing through quiet Harajuku streets to the tree-lined boulevard of Omotesando.","waypoints":[[139.7005,35.6595],[139.7027,35.6702],[139.7085,35.6665]]},
-{"id":"sf-ferry-building-fishermans-wharf","name":"Ferry Building to Fisherman's Wharf","category":"city","place":"San Francisco, USA","blurb":"Stroll the Embarcadero waterfront past piers and the Bay Bridge, ending at the sea lions and sourdough of Fisherman's Wharf.","waypoints":[[-122.3935,37.7955],[-122.4010,37.8020],[-122.4098,37.8087],[-122.4166,37.8081]]}
+  {
+    "id": "nyc-times-square-central-park",
+    "name": "Times Square to Central Park",
+    "category": "city",
+    "place": "New York, USA",
+    "blurb": "Neon canyons of Times Square give way to Bryant Park's lawns and the grand sweep of Fifth Avenue toward Central Park.",
+    "waypoints": [
+      [
+        -73.9855,
+        40.758
+      ],
+      [
+        -73.9835,
+        40.7537
+      ],
+      [
+        -73.9806,
+        40.753
+      ],
+      [
+        -73.979,
+        40.7587
+      ],
+      [
+        -73.9739,
+        40.7644
+      ]
+    ],
+    "region": "USA"
+  },
+  {
+    "id": "paris-louvre-seine-eiffel",
+    "name": "Louvre to the Eiffel Tower",
+    "category": "city",
+    "place": "Paris, France",
+    "blurb": "Walk from the Louvre along the Seine quays and bridges, with the Eiffel Tower rising ahead as the river bends west.",
+    "waypoints": [
+      [
+        2.3376,
+        48.8606
+      ],
+      [
+        2.3375,
+        48.8584
+      ],
+      [
+        2.3136,
+        48.8638
+      ],
+      [
+        2.29531,
+        48.85789
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "london-westminster-tower-bridge",
+    "name": "Westminster to Tower Bridge",
+    "category": "city",
+    "place": "London, UK",
+    "blurb": "Cross Westminster Bridge, follow the South Bank past the Thames riverside, and finish at the iconic Tower Bridge.",
+    "waypoints": [
+      [
+        -0.1226,
+        51.5008
+      ],
+      [
+        -0.116,
+        51.5058
+      ],
+      [
+        -0.09,
+        51.504
+      ],
+      [
+        -0.077,
+        51.5045
+      ],
+      [
+        -0.0754,
+        51.5055
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "tokyo-shibuya-harajuku-omotesando",
+    "name": "Shibuya to Omotesando",
+    "category": "city",
+    "place": "Tokyo, Japan",
+    "blurb": "From the chaos of Shibuya Crossing through quiet Harajuku streets to the tree-lined boulevard of Omotesando.",
+    "waypoints": [
+      [
+        139.7005,
+        35.6595
+      ],
+      [
+        139.7027,
+        35.6702
+      ],
+      [
+        139.7085,
+        35.6665
+      ]
+    ],
+    "region": "Asia"
+  },
+  {
+    "id": "sf-ferry-building-fishermans-wharf",
+    "name": "Ferry Building to Fisherman's Wharf",
+    "category": "city",
+    "place": "San Francisco, USA",
+    "blurb": "Stroll the Embarcadero waterfront past piers and the Bay Bridge, ending at the sea lions and sourdough of Fisherman's Wharf.",
+    "waypoints": [
+      [
+        -122.3935,
+        37.7955
+      ],
+      [
+        -122.401,
+        37.802
+      ],
+      [
+        -122.4098,
+        37.8087
+      ],
+      [
+        -122.4166,
+        37.8081
+      ]
+    ],
+    "region": "USA"
+  }
 ]

@@ -1,9 +1,16 @@
 import type { LngLat } from './geo';
 
-export interface Route { id: string; name: string; category: 'city' | 'hike' | 'scenic'; place: string; blurb: string; distanceKm: number; coords: LngLat[] }
+export interface Route { id: string; name: string; category: 'city' | 'hike' | 'scenic'; region: string; place: string; blurb: string; distanceKm: number; coords: LngLat[] }
 
 const mods = import.meta.glob('./data/routes/*.json', { eager: true, import: 'default' }) as Record<string, Route[]>;
-export const ROUTES: Route[] = ['cities', 'hikes', 'scenic'].flatMap((k) => mods[`./data/routes/${k}.json`] ?? []);
+const ORDER = ['cities', 'usa', 'europe', 'asia', 'world', 'scenic', 'hikes'];
+const fileKey = (k: string) => k.replace(/^.*\/(.*)\.json$/, '$1');
+// every route file in src/data/routes is picked up; known groups first, then any new ones
+export const ROUTES: Route[] = Object.keys(mods)
+  .sort((a, b) => ((ORDER.indexOf(fileKey(a)) + 1 || 99) - (ORDER.indexOf(fileKey(b)) + 1 || 99)))
+  .flatMap((k) => mods[k])
+  .filter((r, i, all) => all.findIndex((x) => x.id === r.id) === i);
+export const REGIONS: [string, string][] = [['USA', '🇺🇸 USA'], ['Europe', '🇪🇺 Europe'], ['Asia', '🌏 Asia'], ['Americas', '🌎 Americas'], ['Oceania', '🌊 Oceania'], ['Africa & Middle East', '🌍 Africa & ME']];
 
 export const VIEWS = [
   { name: 'Walker', icon: '🚶', agl: 1.8, pitch: -2, back: 0 },

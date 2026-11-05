@@ -2,7 +2,7 @@
 // Snaps hand-written waypoints onto real OpenStreetMap walking paths (FOSSGIS OSRM foot router),
 // validates them, simplifies the geometry and writes src/data/routes/<name>.json.
 // Usage: node scripts/build-routes.mjs scripts/route-specs/hikes.json [more spec files...]
-// Spec entry: { id, name, category: "city"|"hike"|"scenic", place, blurb, waypoints: [[lng,lat], ...] }
+// Spec entry: { id, name, category: "city"|"hike"|"scenic", region, place, blurb, waypoints: [[lng,lat], ...] }
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { basename } from 'node:path';
@@ -34,6 +34,20 @@ function simplify(pts, tol) {
   return pts.filter((_, i) => keep[i]);
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// FOSSGIS fair use is 1 request/second for everyone on this machine: serialize across processes.
+import { mkdirSync as mk, rmdirSync, statSync, utimesSync, writeFileSync as wf } from 'node:fs';
+import { tmpdir } from 'node:os';
+const LOCK = tmpdir() + '/wyw-osrm.lock', STAMP = tmpdir() + '/wyw-osrm.last';
+async function throttle() {
+  for (;;) {
+    try { mk(LOCK); break; } catch { try { if (Date.now() - statSync(LOCK).mtimeMs > 30000) rmdirSync(LOCK); } catch { /* raced */ } await sleep(150); }
+  }
+  let last = 0; try { last = statSync(STAMP).mtimeMs; } catch { wf(STAMP, ''); }
+  const wait = last + 1100 - Date.now();
+  if (wait > 0) await sleep(wait);
+  const now = new Date(); utimesSync(STAMP, now, now);
+  rmdirSync(LOCK);
+}
 
 let failed = 0;
 for (const file of process.argv.slice(2)) {
@@ -48,10 +62,10 @@ for (const file of process.argv.slice(2)) {
     if (!errs.length) {
       const coords = s.waypoints.map(([lng, lat]) => `${lng.toFixed(6)},${lat.toFixed(6)}`).join(';');
       const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${coords}?overview=full&geometries=geojson&continue_straight=true`;
+      await throttle();
       try {
         res = JSON.parse(execFileSync('curl', ['-s', '-m', '60', '-A', 'walkyourway-route-builder', url], { encoding: 'utf8' }));
       } catch (e) { errs.push('router request failed: ' + e.message.slice(0, 80)); }
-      await sleep(1100); // FOSSGIS fair use: max 1 request / second
     }
     if (res && res.code !== 'Ok') errs.push('router: ' + res.code + ' ' + (res.message || ''));
     if (res && res.code === 'Ok') {
@@ -63,7 +77,7 @@ for (const file of process.argv.slice(2)) {
       if (km * 1000 > direct * 2.6 && km > 3) errs.push(`route ${km.toFixed(1)} km is ${(km * 1000 / direct).toFixed(1)}x the waypoint distance - likely a detour around a missing path`);
       if (!errs.length) {
         const geom = simplify(res.routes[0].geometry.coordinates, 2.5).map(([x, y]) => [+x.toFixed(6), +y.toFixed(6)]);
-        out.push({ id: s.id, name: s.name, category: s.category, place: s.place, blurb: s.blurb, distanceKm: +km.toFixed(2), coords: geom });
+        out.push({ id: s.id, name: s.name, category: s.category, region: s.region, place: s.place, blurb: s.blurb, distanceKm: +km.toFixed(2), coords: geom });
       }
     }
     if (errs.length) failed++;

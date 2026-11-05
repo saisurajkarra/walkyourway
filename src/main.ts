@@ -6,7 +6,7 @@ import { Landmarks, drawMinimap } from './extras';
 import type { ViewEngine } from './engines/types';
 import { VIDEOS, startVideoWalk } from './video';
 import {
-  ROUTES, VIEWS, settings, saveSettings, history, saveWalk, keys, availableEngines, ENGINE_LABEL, thumb, type EngineKind,
+  ROUTES, REGIONS, VIEWS, settings, saveSettings, history, saveWalk, keys, availableEngines, ENGINE_LABEL, thumb, type EngineKind,
   fmtSpeed, speedUnit, fmtDist, fmtTime, fmtPace, paceUnit, kcalPerSec, strideM, type Route,
 } from './store';
 
@@ -19,13 +19,32 @@ const stepSpeed = (dir: number) => { settings.speedKmh = clampSpeed(settings.spe
 
 // ======================= HOME =======================
 let filter: 'all' | Route['category'] = 'all';
+let region = 'all';
+let query = '';
+
+function card(r: Route) {
+  const v = VIDEOS.get(r.id);
+  return `<button class="card" data-id="${r.id}">
+    <img loading="lazy" decoding="async" alt="" src="${v ? `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg` : thumb(r.coords[Math.floor(r.coords.length / 2)])}">
+    <span class="badge">${CAT[r.category].icon} ${v ? `🎞️ Real film · ${Math.round(v.durationSec / 60)} min` : `${fmtDist(r.distanceKm * 1000)} · ~${Math.round((r.distanceKm / settings.speedKmh) * 60)} min`}</span>
+    <span class="name">${esc(r.name)}</span>
+    <span class="place">${esc(r.place)}</span>
+    <span class="blurb">${esc(r.blurb)}</span>
+  </button>`;
+}
+function cardsHtml() {
+  const q = query.trim().toLowerCase();
+  const list = ROUTES.filter((r) => (filter === 'all' || r.category === filter) && (region === 'all' || r.region === region) && (!q || `${r.name} ${r.place} ${r.blurb}`.toLowerCase().includes(q)));
+  return list.length ? list.map(card).join('') : `<div class="muted empty">No walks match “${esc(query)}”. Press <b>Go</b> to walk anywhere on Earth.</div>`;
+}
 
 function home() {
   const totalKm = history.reduce((a, h) => a + h.km, 0);
+  const regions = REGIONS.filter(([k]) => ROUTES.some((r) => r.region === k));
   app.innerHTML = `
   <main class="home">
     <header class="top">
-      <div><h1>Walk<span>Your</span>Way</h1><p class="tag">Real places · your speed · your way</p></div>
+      <div><h1>Walk<span>Your</span>Way</h1><p class="tag">${ROUTES.length} real walks · ${new Set(ROUTES.map((r) => r.place.split(',').pop()!.trim())).size} countries · your speed</p></div>
       <button class="icon-btn" id="b-set" aria-label="Settings">⚙️</button>
     </header>
     <section class="speed-card">
@@ -35,47 +54,47 @@ function home() {
         <div class="speed-val"><b id="h-speed">${fmtSpeed(settings.speedKmh)}</b> <small>${speedUnit()}</small><div class="pace">${fmtPace(settings.speedKmh)}</div></div>
         <button class="round" id="h-plus" aria-label="Faster">+</button>
       </div>
-      <div class="mode-note">${keys().google ? '📷 Real View (eye-level 360° photos) + 🌐 3D World are on' : keys().ion ? '🌐 3D World is on. <a href="#" id="b-pr">Add a Google key</a> for 📷 eye-level Real View' : '<b>🛰️ Map preview only. This is not the real experience.</b> Real eye-level street photos need a Google Maps key (about 2 minutes). <a href="#" id="b-pr">Set it up</a>'}</div>
+      <div class="mode-note">🎞️ Every walk is a real filmed walk that moves at your speed. Tap 🧭 Explore inside a walk to turn your own way.</div>
     </section>
     <form class="search" id="f-search">
-      <input id="q" placeholder="Walk anywhere: search a place…" autocomplete="off" enterkeyhint="search" />
+      <input id="q" placeholder="Search walks, or any place on Earth…" autocomplete="off" enterkeyhint="search" value="${esc(query)}" />
       <button>Go</button>
     </form>
     <div id="results"></div>
-    <nav class="chips">
-      ${(['all', 'city', 'hike', 'scenic'] as const).map((c) => `<button data-f="${c}" class="${filter === c ? 'on' : ''}">${c === 'all' ? '🌍 All' : `${CAT[c].icon} ${CAT[c].name}`}</button>`).join('')}
+    <nav class="chips" id="regions">
+      <button data-r="all" class="${region === 'all' ? 'on' : ''}">🌍 Everywhere</button>
+      ${regions.map(([k, l]) => `<button data-r="${esc(k)}" class="${region === k ? 'on' : ''}">${l} <small>${ROUTES.filter((r) => r.region === k).length}</small></button>`).join('')}
     </nav>
-    <section class="cards">
-      ${ROUTES.filter((r) => filter === 'all' || r.category === filter).map((r) => `
-        <button class="card" data-id="${r.id}" style="background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.78)),url('${thumb(r.coords[Math.floor(r.coords.length / 2)])}')">
-          <span class="badge">${CAT[r.category].icon} ${VIDEOS.has(r.id) ? `🎞️ Real film · ${Math.round(VIDEOS.get(r.id)!.durationSec / 60)} min` : `${fmtDist(r.distanceKm * 1000)} · ~${Math.round((r.distanceKm / settings.speedKmh) * 60)} min`}</span>
-          <span class="name">${esc(r.name)}</span>
-          <span class="place">${esc(r.place)}</span>
-          <span class="blurb">${esc(r.blurb)}</span>
-        </button>`).join('')}
-    </section>
+    <nav class="chips" id="cats">
+      ${(['all', 'city', 'hike', 'scenic'] as const).map((c) => `<button data-f="${c}" class="${filter === c ? 'on' : ''}">${c === 'all' ? 'All types' : `${CAT[c].icon} ${CAT[c].name}`}</button>`).join('')}
+    </nav>
+    <section class="cards" id="cards">${cardsHtml()}</section>
     ${history.length ? `<section class="hist"><h2>Your walks · ${fmtDist(totalKm * 1000)} total</h2>${history.slice(0, 8).map((h) => `<div class="row"><span>${esc(h.name)}</span><span>${fmtDist(h.km * 1000)} · ${fmtTime(h.sec)}</span></div>`).join('')}</section>` : ''}
     <footer>Tip: on iPhone tap Share → <b>Add to Home Screen</b> for full-screen walking.</footer>
   </main>`;
   $('#h-minus').onclick = () => { stepSpeed(-1); home(); };
   $('#h-plus').onclick = () => { stepSpeed(1); home(); };
   $('#b-set').onclick = openSettings;
-  $('#b-pr')?.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
-  app.querySelectorAll<HTMLButtonElement>('.chips button').forEach((b) => (b.onclick = () => { filter = b.dataset.f as typeof filter; home(); }));
-  app.querySelectorAll<HTMLButtonElement>('.card').forEach((b) => (b.onclick = () => {
+  app.querySelectorAll<HTMLButtonElement>('#cats button').forEach((b) => (b.onclick = () => { filter = b.dataset.f as typeof filter; home(); }));
+  app.querySelectorAll<HTMLButtonElement>('#regions button').forEach((b) => (b.onclick = () => { region = b.dataset.r!; home(); }));
+  $('#cards').onclick = (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
+    if (!b) return;
     const r = ROUTES.find((x) => x.id === b.dataset.id)!, v = VIDEOS.get(r.id);
     if (v) void startVideoWalk(app, r, v, home, (pos) => startWalk(r.name, pos, null));
     else startWalk(r.name, r.coords[0], r);
-  }));
+  };
+  const qi = $<HTMLInputElement>('#q');
+  qi.oninput = () => { query = qi.value; $('#cards').innerHTML = cardsHtml(); };
   $<HTMLFormElement>('#f-search').onsubmit = async (e) => {
     e.preventDefault();
-    const q = $<HTMLInputElement>('#q').value.trim(), out = $('#results');
+    const q = qi.value.trim(), out = $('#results');
     if (!q) return;
-    out.innerHTML = '<div class="muted">Searching…</div>';
+    out.innerHTML = '<div class="muted">Searching places…</div>';
     try {
       const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=6&q=${encodeURIComponent(q)}`);
       const list: { display_name: string; lat: string; lon: string }[] = await r.json();
-      out.innerHTML = list.length ? list.map((p, i) => `<button class="result" data-i="${i}">📍 ${esc(p.display_name)}</button>`).join('') : '<div class="muted">No places found.</div>';
+      out.innerHTML = list.length ? list.map((p, i) => `<button class="result" data-i="${i}">📍 Explore ${esc(p.display_name)}</button>`).join('') : '<div class="muted">No places found.</div>';
       out.querySelectorAll<HTMLButtonElement>('.result').forEach((b) => (b.onclick = () => { const p = list[+b.dataset.i!]; startWalk(p.display_name.split(',')[0], [+p.lon, +p.lat], null); }));
     } catch { out.innerHTML = '<div class="muted">Search is unavailable right now.</div>'; }
   };

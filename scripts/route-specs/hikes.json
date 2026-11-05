@@ -1,196 +1,206 @@
 [
-{
-"id": "first-bachalpsee",
-"name": "First to Bachalpsee",
-"category": "hike",
-"place": "Grindelwald, Switzerland",
-"blurb": "Walk beneath the Eiger and Wetterhorn to a mirror-calm alpine lake reflecting the Bernese giants.",
-"waypoints": [
-[
-8.0535,
-46.66
-],
-[
-8.04053,
-46.66691
-],
-[
-8.02573,
-46.6644
-]
-]
-},
-{
-"id": "tre-cime-loop",
-"name": "Tre Cime di Lavaredo Loop",
-"category": "hike",
-"place": "Dolomites, Italy",
-"blurb": "Circle three colossal limestone towers glowing in the Dolomite sun.",
-"waypoints": [
-[
-12.2967,
-46.6125
-],
-[
-12.3047,
-46.6147
-],
-[
-12.30695,
-46.62083
-],
-[
-12.31516,
-46.62185
-],
-[
-12.2967,
-46.6125
-]
-]
-},
-{
-"id": "preikestolen",
-"name": "Preikestolen Pulpit Rock",
-"category": "hike",
-"place": "Rogaland, Norway",
-"blurb": "Hike up to a flat cliff ledge hanging 600 m above the Lysefjord.",
-"waypoints": [
-[
-6.13785,
-58.99172
-],
-[
-6.18452,
-58.98437
-]
-]
-},
-{
-"id": "rainier-skyline",
-"name": "Skyline Trail, Paradise",
-"category": "hike",
-"place": "Mount Rainier National Park, USA",
-"blurb": "Wildflower meadows and glaciers beneath the 4,392 m volcano of Mount Rainier.",
-"waypoints": [
-[
--121.7364,
-46.7861
-],
-[
--121.73467,
-46.7984
-],
-[
--121.7364,
-46.7861
-]
-]
-},
-{
-"id": "lake-agnes-teahouse",
-"name": "Lake Agnes Tea House",
-"category": "hike",
-"place": "Banff National Park, Canada",
-"blurb": "Climb above turquoise Lake Louise to a glacier-fed lake and a mountaintop tea house.",
-"waypoints": [
-[
--116.2175,
-51.417
-],
-[
--116.24417,
-51.43904
-]
-]
-},
-{
-"id": "kalalau-trail",
-"name": "Kalalau Trail Cliffs",
-"category": "hike",
-"place": "Na Pali Coast, Hawaii, USA",
-"blurb": "Follow sea cliffs above turquoise surf along the emerald Na Pali coast.",
-"waypoints": [
-[
--159.5836,
-22.2196
-],
-[
--159.60025,
-22.20721
-]
-]
-},
-{
-"id": "fitz-roy-capri",
-"name": "Laguna Capri, Fitz Roy",
-"category": "hike",
-"place": "Los Glaciares National Park, Argentina",
-"blurb": "Hike from El Chalt\u00e9n to a turquoise lagoon facing the jagged granite needle of Fitz Roy.",
-"waypoints": [
-[
--72.9016,
--49.3315
-],
-[
--72.951,
--49.298
-]
-]
-},
-{
-"id": "murren-lauterbrunnen",
-"name": "Lauterbrunnen to M\u00fcrren",
-"category": "hike",
-"place": "Bernese Oberland, Switzerland",
-"blurb": "Walk the waterfall-lined valley floor beneath the Eiger, M\u00f6nch and Jungfrau to M\u00fcrren.",
-"waypoints": [
-[
-7.9086,
-46.5936
-],
-[
-7.89413,
-46.55824
-]
-]
-},
-{
-"id": "cinque-terre",
-"name": "Corniglia to Vernazza",
-"category": "hike",
-"place": "Cinque Terre, Italy",
-"blurb": "Follow terraced vineyards and cliff paths above the Ligurian Sea between pastel fishing villages.",
-"waypoints": [
-[
-9.7123,
-44.1194
-],
-[
-9.6837,
-44.135
-]
-]
-},
-{
-"id": "eiger-trail",
-"name": "Eiger Trail",
-"category": "hike",
-"place": "Grindelwald, Switzerland",
-"blurb": "Trace the base of the 1,800 m Eiger North Face, past glaciers and alpine meadows.",
-"waypoints": [
-[
-7.965,
-46.585
-],
-[
-7.99167,
-46.59281
-],
-[
-8.012,
-46.624
-]
-]
-}
+  {
+    "id": "first-bachalpsee",
+    "name": "First to Bachalpsee",
+    "category": "hike",
+    "place": "Grindelwald, Switzerland",
+    "blurb": "Walk beneath the Eiger and Wetterhorn to a mirror-calm alpine lake reflecting the Bernese giants.",
+    "waypoints": [
+      [
+        8.0535,
+        46.66
+      ],
+      [
+        8.04053,
+        46.66691
+      ],
+      [
+        8.02573,
+        46.6644
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "tre-cime-loop",
+    "name": "Tre Cime di Lavaredo Loop",
+    "category": "hike",
+    "place": "Dolomites, Italy",
+    "blurb": "Circle three colossal limestone towers glowing in the Dolomite sun.",
+    "waypoints": [
+      [
+        12.2967,
+        46.6125
+      ],
+      [
+        12.3047,
+        46.6147
+      ],
+      [
+        12.30695,
+        46.62083
+      ],
+      [
+        12.31516,
+        46.62185
+      ],
+      [
+        12.2967,
+        46.6125
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "preikestolen",
+    "name": "Preikestolen Pulpit Rock",
+    "category": "hike",
+    "place": "Rogaland, Norway",
+    "blurb": "Hike up to a flat cliff ledge hanging 600 m above the Lysefjord.",
+    "waypoints": [
+      [
+        6.13785,
+        58.99172
+      ],
+      [
+        6.18452,
+        58.98437
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "rainier-skyline",
+    "name": "Skyline Trail, Paradise",
+    "category": "hike",
+    "place": "Mount Rainier National Park, USA",
+    "blurb": "Wildflower meadows and glaciers beneath the 4,392 m volcano of Mount Rainier.",
+    "waypoints": [
+      [
+        -121.7364,
+        46.7861
+      ],
+      [
+        -121.73467,
+        46.7984
+      ],
+      [
+        -121.7364,
+        46.7861
+      ]
+    ],
+    "region": "USA"
+  },
+  {
+    "id": "lake-agnes-teahouse",
+    "name": "Lake Agnes Tea House",
+    "category": "hike",
+    "place": "Banff National Park, Canada",
+    "blurb": "Climb above turquoise Lake Louise to a glacier-fed lake and a mountaintop tea house.",
+    "waypoints": [
+      [
+        -116.2175,
+        51.417
+      ],
+      [
+        -116.24417,
+        51.43904
+      ]
+    ],
+    "region": "Americas"
+  },
+  {
+    "id": "kalalau-trail",
+    "name": "Kalalau Trail Cliffs",
+    "category": "hike",
+    "place": "Na Pali Coast, Hawaii, USA",
+    "blurb": "Follow sea cliffs above turquoise surf along the emerald Na Pali coast.",
+    "waypoints": [
+      [
+        -159.5836,
+        22.2196
+      ],
+      [
+        -159.60025,
+        22.20721
+      ]
+    ],
+    "region": "USA"
+  },
+  {
+    "id": "fitz-roy-capri",
+    "name": "Laguna Capri, Fitz Roy",
+    "category": "hike",
+    "place": "Los Glaciares National Park, Argentina",
+    "blurb": "Hike from El Chaltén to a turquoise lagoon facing the jagged granite needle of Fitz Roy.",
+    "waypoints": [
+      [
+        -72.9016,
+        -49.3315
+      ],
+      [
+        -72.951,
+        -49.298
+      ]
+    ],
+    "region": "Americas"
+  },
+  {
+    "id": "murren-lauterbrunnen",
+    "name": "Lauterbrunnen to Mürren",
+    "category": "hike",
+    "place": "Bernese Oberland, Switzerland",
+    "blurb": "Walk the waterfall-lined valley floor beneath the Eiger, Mönch and Jungfrau to Mürren.",
+    "waypoints": [
+      [
+        7.9086,
+        46.5936
+      ],
+      [
+        7.89413,
+        46.55824
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "cinque-terre",
+    "name": "Corniglia to Vernazza",
+    "category": "hike",
+    "place": "Cinque Terre, Italy",
+    "blurb": "Follow terraced vineyards and cliff paths above the Ligurian Sea between pastel fishing villages.",
+    "waypoints": [
+      [
+        9.7123,
+        44.1194
+      ],
+      [
+        9.6837,
+        44.135
+      ]
+    ],
+    "region": "Europe"
+  },
+  {
+    "id": "eiger-trail",
+    "name": "Eiger Trail",
+    "category": "hike",
+    "place": "Grindelwald, Switzerland",
+    "blurb": "Trace the base of the 1,800 m Eiger North Face, past glaciers and alpine meadows.",
+    "waypoints": [
+      [
+        7.965,
+        46.585
+      ],
+      [
+        7.99167,
+        46.59281
+      ],
+      [
+        8.012,
+        46.624
+      ]
+    ],
+    "region": "Europe"
+  }
 ]
