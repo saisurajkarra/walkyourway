@@ -4,6 +4,7 @@ import { WalkGraph } from './graph';
 import { Walker, type Junction } from './walker';
 import { Landmarks, drawMinimap } from './extras';
 import type { ViewEngine } from './engines/types';
+import { VIDEOS, startVideoWalk } from './video';
 import {
   ROUTES, VIEWS, settings, saveSettings, history, saveWalk, keys, availableEngines, ENGINE_LABEL, thumb, type EngineKind,
   fmtSpeed, speedUnit, fmtDist, fmtTime, fmtPace, paceUnit, kcalPerSec, strideM, type Route,
@@ -47,7 +48,7 @@ function home() {
     <section class="cards">
       ${ROUTES.filter((r) => filter === 'all' || r.category === filter).map((r) => `
         <button class="card" data-id="${r.id}" style="background-image:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.78)),url('${thumb(r.coords[Math.floor(r.coords.length / 2)])}')">
-          <span class="badge">${CAT[r.category].icon} ${fmtDist(r.distanceKm * 1000)} · ~${Math.round((r.distanceKm / settings.speedKmh) * 60)} min</span>
+          <span class="badge">${CAT[r.category].icon} ${VIDEOS.has(r.id) ? `🎞️ Real film · ${Math.round(VIDEOS.get(r.id)!.durationSec / 60)} min` : `${fmtDist(r.distanceKm * 1000)} · ~${Math.round((r.distanceKm / settings.speedKmh) * 60)} min`}</span>
           <span class="name">${esc(r.name)}</span>
           <span class="place">${esc(r.place)}</span>
           <span class="blurb">${esc(r.blurb)}</span>
@@ -61,7 +62,11 @@ function home() {
   $('#b-set').onclick = openSettings;
   $('#b-pr')?.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
   app.querySelectorAll<HTMLButtonElement>('.chips button').forEach((b) => (b.onclick = () => { filter = b.dataset.f as typeof filter; home(); }));
-  app.querySelectorAll<HTMLButtonElement>('.card').forEach((b) => (b.onclick = () => { const r = ROUTES.find((x) => x.id === b.dataset.id)!; startWalk(r.name, r.coords[0], r); }));
+  app.querySelectorAll<HTMLButtonElement>('.card').forEach((b) => (b.onclick = () => {
+    const r = ROUTES.find((x) => x.id === b.dataset.id)!, v = VIDEOS.get(r.id);
+    if (v) void startVideoWalk(app, r, v, home, (pos) => startWalk(r.name, pos, null));
+    else startWalk(r.name, r.coords[0], r);
+  }));
   $<HTMLFormElement>('#f-search').onsubmit = async (e) => {
     e.preventDefault();
     const q = $<HTMLInputElement>('#q').value.trim(), out = $('#results');

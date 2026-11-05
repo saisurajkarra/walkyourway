@@ -1,0 +1,47 @@
+[
+  {
+    "routeId": "nyc-times-square-central-park",
+    "youtubeId": "jnhs74j9kRE",
+    "title": "Times Square to Central Park 4K Walking Tour | NYC Spring 2021",
+    "channel": "Afraz Explores",
+    "durationSec": 1810,
+    "startSec": 0,
+    "paceKmh": 4.5
+  },
+  {
+    "routeId": "paris-louvre-seine-eiffel",
+    "youtubeId": "7d_C0JW3sdo",
+    "title": "[4k] Paris, France Walk from Louvre to Eiffel Tower",
+    "channel": "MrKong",
+    "durationSec": 2863,
+    "startSec": 0,
+    "paceKmh": 4.5
+  },
+  {
+    "routeId": "london-westminster-tower-bridge",
+    "youtubeId": "21kzuo1sLDA",
+    "title": "Tower Bridge - London Walking Tour | 4K POV Thames Walk",
+    "channel": "Lets Walk the World !!!",
+    "durationSec": 1653,
+    "startSec": 0,
+    "paceKmh": 4.5
+  },
+  {
+    "routeId": "tokyo-shibuya-harajuku-omotesando",
+    "youtubeId": "vpwk6LJ3IiY",
+    "title": "Tokyo Japan - Shibuya to Harajuku via Omotesando | Japan Walking Tour【4K HDR】",
+    "channel": "JAPAN WALKING",
+    "durationSec": 3724,
+    "startSec": 0,
+    "paceKmh": 4.5
+  },
+  {
+    "routeId": "sf-ferry-building-fishermans-wharf",
+    "youtubeId": "xuT0hVpLqBM",
+    "title": "San Francisco Embarcadero Walk 🌉 Ferry Building to Pier 39 on a Sunny Day (4K Walking Tour)",
+    "channel": "Yogis Travel Blog around the world",
+    "durationSec": 2837,
+    "startSec": 0,
+    "paceKmh": 4.5
+  }
+]

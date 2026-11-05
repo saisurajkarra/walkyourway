@@ -1,10 +1,17 @@
 # WalkYourWay
 
-Walk real places in 3D at your treadmill speed, and **choose your own way** at every real street corner and trail fork.
+Walk real places at your treadmill speed:
+
+- **🎞️ Filmed walks (Kinomap-style).** All 25 routes have a real 4K first-person walking film that plays exactly at your speed, with a live map and stats. No key is needed.
+- **🧭 Explore.** Leave the film anywhere and walk on freely, **choosing your own way** at every real street corner and trail fork. This uses 📷 Real View (eye-level street photos) or 🌐 3D World.
 
 **Live app:** https://saisurajkarra.github.io/walkyourway/. On iPhone, open it in Safari, then Share → **Add to Home Screen**.
 
-## How it works
+## How filmed walks stay in sync
+
+Your treadmill distance decides where in the film you should be: distance ÷ the pace the filmer walked. Every 0.3 s the playback rate is steered to stay there, so 6 km/h on a film walked at 4.5 km/h plays at 1.33×, and stopping the treadmill stops the film. The rate is capped at 2× (YouTube's maximum). If a film feels too fast or slow, tap the 🎞️ rate chip and calibrate the filmer's pace; the app remembers it for that film. Films are official YouTube embeds and credit their creators. To add or swap films, use `python3 scripts/find-videos.py search|verify` and edit `src/data/videos/*.json`.
+
+## How exploring works
 
 ```
 your speed ──► walk engine (real OpenStreetMap streets & trails, ← ↑ → choices at every junction)
