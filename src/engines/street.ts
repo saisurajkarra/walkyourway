@@ -300,7 +300,8 @@ export class StreetEngine implements ViewEngine {
     });
     // One photo at a time (no multi-photo ghosting): stay on the current capture sequence, step to
     // the next photo when it's clearly closer, and crossfade quickly over the step.
-    const loaded = near.filter((n) => n.p.tex && n.d < 80);
+    let loaded = near.filter((n) => n.p.tex && n.d < 80);
+    if (!loaded.length) loaded = near.filter((n) => n.p.tex).slice(0, 1); // before the first photo: show the nearest, never black
     if (loaded.length) {
       const cur = this.cur, curD = cur ? Math.hypot(cur.xy[0] - cx, cur.xy[1] - cy) : Infinity;
       const score = (n: { p: Pano; d: number }) => n.d + (cur?.seq && n.p.seq && n.p.seq !== cur.seq ? 6 : 0);
