@@ -34,7 +34,7 @@ function home() {
         <div class="speed-val"><b id="h-speed">${fmtSpeed(settings.speedKmh)}</b> <small>${speedUnit()}</small><div class="pace">${fmtPace(settings.speedKmh)}</div></div>
         <button class="round" id="h-plus" aria-label="Faster">+</button>
       </div>
-      <div class="mode-note">${keys().google ? '📷 Real View (eye-level 360° photos) + 🌐 3D World are on' : keys().ion ? '🌐 3D World is on. <a href="#" id="b-pr">Add a Google key</a> for 📷 eye-level Real View' : '🛰️ Satellite preview. <a href="#" id="b-pr">Turn on real 3D + eye-level photos</a>'}</div>
+      <div class="mode-note">${keys().google ? '📷 Real View (eye-level 360° photos) + 🌐 3D World are on' : keys().ion ? '🌐 3D World is on. <a href="#" id="b-pr">Add a Google key</a> for 📷 eye-level Real View' : '<b>🛰️ Map preview only. This is not the real experience.</b> Real eye-level street photos need a Google Maps key (about 2 minutes). <a href="#" id="b-pr">Set it up</a>'}</div>
     </section>
     <form class="search" id="f-search">
       <input id="q" placeholder="Walk anywhere: search a place…" autocomplete="off" enterkeyhint="search" />
@@ -213,7 +213,7 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
       engine = r.engine; kind = r.kind;
       if (route) engine.setRoute(route.coords);
       engine.setQuality?.(quality);
-      viewIdx = kind === 'terrain' ? 2 : 1;
+      viewIdx = kind === 'terrain' ? 2 : 0; // real imagery starts on the road at eye level
       setButtons();
     } finally { swapping = false; }
   };

@@ -71,14 +71,14 @@ dialog label input, dialog label select { margin-top: 4px; }
 .toast { position: absolute; z-index: 4; left: 50%; top: calc(var(--st) + 128px); transform: translate(-50%, -10px); max-width: min(92vw, 520px); padding: 10px 16px; border-radius: 14px; background: rgba(8,14,26,.85); font-size: 14px; opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none; text-align: center; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 .toast a { color: var(--text); text-decoration: none; }
-.junction { display: none; max-width: 560px; margin: 0 auto 10px; padding: 10px; border-radius: 18px; background: var(--panel); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); animation: rise .25s ease-out; }
+.junction { display: none; max-width: 520px; margin: 0 auto 8px; padding: 7px 8px; border-radius: 18px; background: var(--panel); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); animation: rise .25s ease-out; }
 .junction.show { display: block; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
-.jhead { font-size: 12px; color: var(--muted); margin: 0 4px 8px; } .jhead .dist { color: var(--text); font-weight: 600; }
+.jhead { font-size: 11px; color: var(--muted); margin: 0 4px 5px; } .jhead .dist { color: var(--text); font-weight: 600; }
 .opts { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
-.opts button { flex: 1 0 0; min-width: 92px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1.5px solid transparent; font-size: 12px; position: relative; }
+.opts button { flex: 1 0 0; min-width: 84px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 6px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1.5px solid transparent; font-size: 12px; position: relative; }
 .opts button span:not(.arr) { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.opts .arr { font-size: 24px; line-height: 1; }
+.opts .arr { font-size: 19px; line-height: 1; }
 .opts button.auto { border-color: rgba(56,189,248,.6); }
 .opts button.picked { background: var(--accent); color: #04121f; font-weight: 700; }
 .opts i { position: absolute; top: 3px; right: 6px; font-style: normal; font-size: 11px; }
