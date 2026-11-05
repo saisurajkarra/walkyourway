@@ -114,6 +114,7 @@ function openSettings() {
     <p class="muted"><b>Google Maps key</b> with “Map Tiles API” enabled unlocks both 📷 Real View (Street View photos at eye level) and 🌐 3D World (Google Photorealistic 3D Tiles). A <b>Cesium ion token</b> unlocks 3D World only. Stored on this device.</p>
     <label>Google Maps API key<input name="googleKey" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
     <label>Cesium ion token <small>(free at cesium.com/ion)</small><input name="ionToken" autocomplete="off" spellcheck="false" placeholder="eyJ…"></label>
+    <label>Mapillary client token <small>(free at mapillary.com/developer, worldwide street photos)</small><input name="mapillaryToken" autocomplete="off" spellcheck="false" placeholder="MLY|…"></label>
     <div class="row-btns"><button value="cancel" class="ghost">Cancel</button><button value="ok">Save</button></div>
   </form>`;
   document.body.appendChild(d);
@@ -128,6 +129,7 @@ function openSettings() {
       settings.heightCm = +val('heightCm') || 170;
       settings.googleKey = val('googleKey').trim();
       settings.ionToken = val('ionToken').trim();
+      settings.mapillaryToken = val('mapillaryToken').trim();
       saveSettings();
     }
     d.remove(); home();
@@ -147,7 +149,7 @@ async function makeEngine(want: EngineKind, el: HTMLElement, start: LngLat, cat:
     try {
       el.innerHTML = '';
       let e: ViewEngine;
-      if (kind === 'street') e = new (await import('./engines/street')).StreetEngine(k.google, WALL[cat]);
+      if (kind === 'street') e = new (await import('./engines/street')).StreetEngine(k.google, k.mapillary, WALL[cat]);
       else if (kind === 'photoreal') e = new (await import('./engines/photoreal')).PhotorealEngine(k.google, k.ion);
       else e = new (await import('./engines/terrain')).TerrainEngine();
       await e.init(el, start);
@@ -430,7 +432,7 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
     // walked back into street-photo coverage while on a fallback view: return to Real View
     if (wantStreet && kind !== 'street' && !swapping && !probing && t - lastProbe > 12000) {
       lastProbe = t; probing = true;
-      void import('./engines/street').then((m) => m.StreetEngine.available(cam, keys().google)).then((ok) => {
+      void import('./engines/street').then((m) => m.StreetEngine.available(cam, keys().google, keys().mapillary)).then((ok) => {
         probing = false;
         if (ok && alive && kind !== 'street') { toast('📷 Real street photos here. Switching to Real View'); void swap('street', cam); }
       });

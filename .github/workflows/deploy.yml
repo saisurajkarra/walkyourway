@@ -29,6 +29,7 @@ jobs:
           # photoreal 3D for every visitor. Restrict the key/token to your Pages URL.
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
           VITE_CESIUM_ION_TOKEN: ${{ secrets.CESIUM_ION_TOKEN }}
+          VITE_MAPILLARY_TOKEN: ${{ secrets.MAPILLARY_TOKEN }}
       - name: Publish dist/ to the gh-pages branch
         run: |
           cd dist

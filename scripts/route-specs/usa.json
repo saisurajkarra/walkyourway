@@ -1,0 +1,542 @@
+[
+ {
+  "id": "chicago-magnificent-mile",
+  "name": "Magnificent Mile",
+  "category": "city",
+  "region": "USA",
+  "place": "Chicago, USA",
+  "blurb": "Michigan Avenue from the Chicago River past the Wrigley Building and Water Tower to Oak Street.",
+  "waypoints": [
+   [
+    -87.6247,
+    41.8886
+   ],
+   [
+    -87.6244,
+    41.8938
+   ],
+   [
+    -87.6244,
+    41.8972
+   ],
+   [
+    -87.6246,
+    41.9005
+   ]
+  ]
+ },
+ {
+  "id": "boston-freedom-trail",
+  "name": "Freedom Trail",
+  "category": "city",
+  "region": "USA",
+  "place": "Boston, USA",
+  "blurb": "Red-brick Revolutionary history from Boston Common through Faneuil Hall to the Old North Church.",
+  "waypoints": [
+   [
+    -71.0656,
+    42.3555
+   ],
+   [
+    -71.0638,
+    42.3588
+   ],
+   [
+    -71.0587,
+    42.3569
+   ],
+   [
+    -71.0568,
+    42.36
+   ],
+   [
+    -71.0536,
+    42.3637
+   ],
+   [
+    -71.0544,
+    42.3663
+   ]
+  ]
+ },
+ {
+  "id": "dc-national-mall",
+  "name": "National Mall",
+  "category": "city",
+  "region": "USA",
+  "place": "Washington DC, USA",
+  "blurb": "Lincoln Memorial, the Reflecting Pool and the Washington Monument all the way up to the Capitol.",
+  "waypoints": [
+   [
+    -77.0502,
+    38.8893
+   ],
+   [
+    -77.0405,
+    38.8894
+   ],
+   [
+    -77.0353,
+    38.8895
+   ],
+   [
+    -77.023,
+    38.889
+   ],
+   [
+    -77.0121,
+    38.8896
+   ]
+  ]
+ },
+ {
+  "id": "la-venice-santa-monica",
+  "name": "Venice Beach to Santa Monica Pier",
+  "category": "city",
+  "region": "USA",
+  "place": "Los Angeles, USA",
+  "blurb": "Skaters, muscle beach and palm trees along the Pacific boardwalk to the Santa Monica Pier.",
+  "waypoints": [
+   [
+    -118.47356,
+    33.98513
+   ],
+   [
+    -118.477,
+    33.992
+   ],
+   [
+    -118.485,
+    34.0
+   ],
+   [
+    -118.496,
+    34.0085
+   ]
+  ]
+ },
+ {
+  "id": "seattle-pike-place-waterfront",
+  "name": "Pike Place & Waterfront",
+  "category": "city",
+  "region": "USA",
+  "place": "Seattle, USA",
+  "blurb": "From Westlake through Pike Place Market down to the Elliott Bay waterfront piers.",
+  "waypoints": [
+   [
+    -122.3366,
+    47.6114
+   ],
+   [
+    -122.3425,
+    47.6097
+   ],
+   [
+    -122.3405,
+    47.6076
+   ],
+   [
+    -122.3388,
+    47.6021
+   ]
+  ]
+ },
+ {
+  "id": "miami-ocean-drive",
+  "name": "Ocean Drive",
+  "category": "city",
+  "region": "USA",
+  "place": "Miami Beach, USA",
+  "blurb": "Art Deco hotels, neon and palm-lined Lummus Park along South Beach's Ocean Drive.",
+  "waypoints": [
+   [
+    -80.1344,
+    25.765
+   ],
+   [
+    -80.13,
+    25.772
+   ],
+   [
+    -80.1303,
+    25.779
+   ],
+   [
+    -80.1303,
+    25.7826
+   ]
+  ]
+ },
+ {
+  "id": "new-orleans-french-quarter",
+  "name": "French Quarter",
+  "category": "city",
+  "region": "USA",
+  "place": "New Orleans, USA",
+  "blurb": "Iron-lace balconies, Jackson Square and Bourbon Street through to Armstrong Park.",
+  "waypoints": [
+   [
+    -90.0622,
+    29.9498
+   ],
+   [
+    -90.0617,
+    29.9575
+   ],
+   [
+    -90.0637,
+    29.9574
+   ],
+   [
+    -90.066,
+    29.9582
+   ],
+   [
+    -90.069,
+    29.9611
+   ]
+  ]
+ },
+ {
+  "id": "las-vegas-strip",
+  "name": "The Strip",
+  "category": "city",
+  "region": "USA",
+  "place": "Las Vegas, USA",
+  "blurb": "Mandalay Bay to the Bellagio fountains and Caesars Palace under the neon.",
+  "waypoints": [
+   [
+    -115.1765,
+    36.091
+   ],
+   [
+    -115.175,
+    36.0988
+   ],
+   [
+    -115.17543,
+    36.11219
+   ],
+   [
+    -115.1745,
+    36.1162
+   ]
+  ]
+ },
+ {
+  "id": "philadelphia-old-city",
+  "name": "Old City",
+  "category": "city",
+  "region": "USA",
+  "place": "Philadelphia, USA",
+  "blurb": "Independence Hall, Christ Church and cobbled Elfreth's Alley in America's most historic square mile.",
+  "waypoints": [
+   [
+    -75.15,
+    39.9489
+   ],
+   [
+    -75.1448,
+    39.95
+   ],
+   [
+    -75.145,
+    39.9522
+   ],
+   [
+    -75.1437,
+    39.9531
+   ],
+   [
+    -75.1503,
+    39.9556
+   ]
+  ]
+ },
+ {
+  "id": "san-diego-gaslamp-quarter",
+  "name": "Gaslamp Quarter",
+  "category": "city",
+  "region": "USA",
+  "place": "San Diego, USA",
+  "blurb": "Victorian storefronts and lantern-lit restaurants along Fifth Avenue.",
+  "waypoints": [
+   [
+    -117.15749,
+    32.7084
+   ],
+   [
+    -117.1596,
+    32.7105
+   ],
+   [
+    -117.1604,
+    32.7124
+   ],
+   [
+    -117.1613,
+    32.7154
+   ],
+   [
+    -117.1737,
+    32.7148
+   ]
+  ]
+ },
+ {
+  "id": "austin-congress-avenue",
+  "name": "Congress Avenue",
+  "category": "city",
+  "region": "USA",
+  "place": "Austin, USA",
+  "blurb": "Across the Congress Avenue Bridge and up the avenue to the Texas State Capitol.",
+  "waypoints": [
+   [
+    -97.7447,
+    30.261
+   ],
+   [
+    -97.7451,
+    30.263
+   ],
+   [
+    -97.7436,
+    30.2656
+   ],
+   [
+    -97.7433,
+    30.2685
+   ],
+   [
+    -97.7404,
+    30.2711
+   ]
+  ]
+ },
+ {
+  "id": "nashville-broadway",
+  "name": "Broadway",
+  "category": "city",
+  "region": "USA",
+  "place": "Nashville, USA",
+  "blurb": "Neon honky-tonks and live music pouring onto Lower Broadway.",
+  "waypoints": [
+   [
+    -86.774,
+    36.1614
+   ],
+   [
+    -86.7771,
+    36.1612
+   ],
+   [
+    -86.7798,
+    36.162
+   ],
+   [
+    -86.7826,
+    36.1572
+   ]
+  ]
+ },
+ {
+  "id": "savannah-historic-squares",
+  "name": "Historic Squares",
+  "category": "city",
+  "region": "USA",
+  "place": "Savannah, USA",
+  "blurb": "Live oaks, Spanish moss and Bull Street's string of historic squares.",
+  "waypoints": [
+   [
+    -81.0966,
+    32.0678
+   ],
+   [
+    -81.0952,
+    32.073
+   ],
+   [
+    -81.0954,
+    32.0765
+   ],
+   [
+    -81.0916,
+    32.0786
+   ]
+  ]
+ },
+ {
+  "id": "charleston-king-street",
+  "name": "King Street to City Market",
+  "category": "city",
+  "region": "USA",
+  "place": "Charleston, USA",
+  "blurb": "Pastel townhouses and shopping on King Street through to the historic City Market.",
+  "waypoints": [
+   [
+    -79.9318,
+    32.776
+   ],
+   [
+    -79.936,
+    32.784
+   ],
+   [
+    -79.9308,
+    32.7826
+   ]
+  ]
+ },
+ {
+  "id": "portland-downtown",
+  "name": "Downtown Portland",
+  "category": "city",
+  "region": "USA",
+  "place": "Portland, USA",
+  "blurb": "Pioneer Courthouse Square and the leafy downtown blocks out to Waterfront Park.",
+  "waypoints": [
+   [
+    -122.679,
+    45.5188
+   ],
+   [
+    -122.676,
+    45.5205
+   ],
+   [
+    -122.6713,
+    45.521
+   ],
+   [
+    -122.6743,
+    45.5242
+   ],
+   [
+    -122.6765,
+    45.5288
+   ]
+  ]
+ },
+ {
+  "id": "denver-16th-street-mall",
+  "name": "16th Street Mall",
+  "category": "city",
+  "region": "USA",
+  "place": "Denver, USA",
+  "blurb": "The pedestrian mall from Civic Center to historic Union Station beneath the Rockies' skyline.",
+  "waypoints": [
+   [
+    -104.9867,
+    39.7411
+   ],
+   [
+    -104.9936,
+    39.7465
+   ],
+   [
+    -105.0001,
+    39.7532
+   ]
+  ]
+ },
+ {
+  "id": "atlanta-beltline-ponce-city-market",
+  "name": "Ponce City Market & the BeltLine",
+  "category": "city",
+  "region": "USA",
+  "place": "Atlanta, USA",
+  "blurb": "Down the Eastside BeltLine trail from Ponce City Market past street art to Krog Street.",
+  "waypoints": [
+   [
+    -84.3656,
+    33.7725
+   ],
+   [
+    -84.363,
+    33.7665
+   ],
+   [
+    -84.3635,
+    33.7545
+   ]
+  ]
+ },
+ {
+  "id": "honolulu-waikiki-beach-walk",
+  "name": "Waikiki Beach Walk",
+  "category": "city",
+  "region": "USA",
+  "place": "Honolulu, USA",
+  "blurb": "Hotels, surf breaks and Diamond Head views along Waikiki's famous beachfront.",
+  "waypoints": [
+   [
+    -157.8426,
+    21.2842
+   ],
+   [
+    -157.8383,
+    21.282
+   ],
+   [
+    -157.8265,
+    21.2761
+   ],
+   [
+    -157.8207,
+    21.266
+   ]
+  ]
+ },
+ {
+  "id": "nyc-brooklyn-bridge-dumbo",
+  "name": "Brooklyn Bridge & DUMBO",
+  "category": "city",
+  "region": "USA",
+  "place": "New York, USA",
+  "blurb": "Cobbled DUMBO, then over the Brooklyn Bridge's wooden promenade into Lower Manhattan.",
+  "waypoints": [
+   [
+    -73.9903,
+    40.7033
+   ],
+   [
+    -73.9969,
+    40.7061
+   ],
+   [
+    -74.0049,
+    40.7127
+   ]
+  ]
+ },
+ {
+  "id": "sf-chinatown-north-beach",
+  "name": "Chinatown & North Beach",
+  "category": "city",
+  "region": "USA",
+  "place": "San Francisco, USA",
+  "blurb": "Dragon Gate, Grant Avenue lanterns and Little Italy cafes up to Washington Square.",
+  "waypoints": [
+   [
+    -122.4058,
+    37.7908
+   ],
+   [
+    -122.4048,
+    37.7945
+   ],
+   [
+    -122.4065,
+    37.7977
+   ],
+   [
+    -122.4101,
+    37.8008
+   ],
+   [
+    -122.4058,
+    37.8024
+   ]
+  ]
+ }
+]

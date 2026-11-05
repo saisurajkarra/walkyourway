@@ -27,10 +27,11 @@ export interface Settings {
   engine: 'auto' | 'street' | 'photoreal' | 'terrain';
   googleKey: string;
   ionToken: string;
+  mapillaryToken: string;
 }
 export interface WalkRecord { date: number; name: string; km: number; sec: number; kcal: number }
 
-const DEFAULTS: Settings = { units: 'metric', speedKmh: 5, weightKg: 70, heightCm: 170, engine: 'auto', googleKey: '', ionToken: '' };
+const DEFAULTS: Settings = { units: 'metric', speedKmh: 5, weightKg: 70, heightCm: 170, engine: 'auto', googleKey: '', ionToken: '', mapillaryToken: '' };
 
 function read<T>(k: string, d: T): T {
   try { const v = localStorage.getItem(k); return v ? { ...d, ...JSON.parse(v) } : d; } catch { return d; }
@@ -46,6 +47,8 @@ export const saveWalk = (r: WalkRecord) => { history.unshift(r); history.length 
 export const keys = () => ({
   google: settings.googleKey.trim() || (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined) || '',
   ion: settings.ionToken.trim() || (import.meta.env.VITE_CESIUM_ION_TOKEN as string | undefined) || '',
+  // Mapillary *client* token (public by design). Set the MAPILLARY_TOKEN repo secret; never use the client secret.
+  mapillary: (settings.mapillaryToken || '').trim() || (import.meta.env.VITE_MAPILLARY_TOKEN as string | undefined) || '',
 });
 export type EngineKind = 'street' | 'photoreal' | 'terrain';
 /** Engines usable with the configured keys, best first. */

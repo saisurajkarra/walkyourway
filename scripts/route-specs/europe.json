@@ -1,0 +1,376 @@
+[
+ {
+  "id": "rome-colosseum-trevi-pantheon",
+  "name": "Colosseum to Trevi Fountain and the Pantheon",
+  "category": "city",
+  "region": "Europe",
+  "place": "Rome, Italy",
+  "blurb": "Ancient arches give way to baroque splendour as the walk climbs to the Trevi Fountain and ends at the domed Pantheon.",
+  "waypoints": [
+   [
+    12.491903,
+    41.890942
+   ],
+   [
+    12.483285,
+    41.900978
+   ],
+   [
+    12.476833,
+    41.898616
+   ]
+  ]
+ },
+ {
+  "id": "barcelona-rambla-gothic-port-vell",
+  "name": "La Rambla to the Gothic Quarter and Port Vell",
+  "category": "city",
+  "region": "Europe",
+  "place": "Barcelona, Spain",
+  "blurb": "Plane-tree-lined La Rambla leads into the medieval lanes of the Gothic Quarter and down to the harbour under Columbus's column.",
+  "waypoints": [
+   [
+    2.170459,
+    41.387738
+   ],
+   [
+    2.173057,
+    41.381389
+   ],
+   [
+    2.176554,
+    41.38393
+   ],
+   [
+    2.177774,
+    41.375802
+   ]
+  ]
+ },
+ {
+  "id": "amsterdam-centraal-damrak-dam-square",
+  "name": "Central Station to Dam Square",
+  "category": "city",
+  "region": "Europe",
+  "place": "Amsterdam, Netherlands",
+  "blurb": "Cyclists and trams stream past the old canal houses as the walk runs from Centraal Station down Damrak to the royal Dam Square.",
+  "waypoints": [
+   [
+    4.900581,
+    52.378901
+   ],
+   [
+    4.898054,
+    52.37611
+   ],
+   [
+    4.892351,
+    52.373116
+   ],
+   [
+    4.893236,
+    52.367303
+   ]
+  ]
+ },
+ {
+  "id": "venice-strada-nova-rialto-san-marco",
+  "name": "Strada Nova to Rialto and St Mark's Square",
+  "category": "city",
+  "region": "Europe",
+  "place": "Venice, Italy",
+  "blurb": "From the railway station along the busy Strada Nova to the Rialto Bridge and on through the lanes to the golden basilica of St Mark's.",
+  "waypoints": [
+   [
+    12.3209,
+    45.4411
+   ],
+   [
+    12.335655,
+    45.438069
+   ],
+   [
+    12.338672,
+    45.434257
+   ]
+  ]
+ },
+ {
+  "id": "prague-old-town-charles-bridge",
+  "name": "Old Town Square to Charles Bridge",
+  "category": "city",
+  "region": "Europe",
+  "place": "Prague, Czechia",
+  "blurb": "Gothic spires frame the Old Town Square before the walk crosses the statue-lined Charles Bridge into the quiet streets of Malá Strana.",
+  "waypoints": [
+   [
+    14.420971,
+    50.087445
+   ],
+   [
+    14.410149,
+    50.086626
+   ],
+   [
+    14.4076625,
+    50.0838761
+   ],
+   [
+    14.4043312,
+    50.0881139
+   ]
+  ]
+ },
+ {
+  "id": "vienna-ringstrasse-stephansplatz",
+  "name": "Ringstrasse to Stephansplatz",
+  "category": "city",
+  "region": "Europe",
+  "place": "Vienna, Austria",
+  "blurb": "Imperial facades of the Ringstrasse, with the State Opera at its heart, lead to the Gothic spire of St Stephen's Cathedral.",
+  "waypoints": [
+   [
+    16.3652,
+    48.2062
+   ],
+   [
+    16.369194,
+    48.203286
+   ],
+   [
+    16.36909,
+    48.201589
+   ],
+   [
+    16.371517,
+    48.208084
+   ]
+  ]
+ },
+ {
+  "id": "berlin-unter-den-linden-brandenburg-gate",
+  "name": "Unter den Linden to the Brandenburg Gate",
+  "category": "city",
+  "region": "Europe",
+  "place": "Berlin, Germany",
+  "blurb": "The lime-lined boulevard Unter den Linden runs past Bebelplatz to the Brandenburg Gate, the city's most famous monument.",
+  "waypoints": [
+   [
+    13.398552,
+    52.517606
+   ],
+   [
+    13.393826,
+    52.516487
+   ],
+   [
+    13.377703,
+    52.51627
+   ]
+  ]
+ },
+ {
+  "id": "lisbon-rossio-alfama",
+  "name": "Rossio to Alfama and Santa Luzia",
+  "category": "city",
+  "region": "Europe",
+  "place": "Lisbon, Portugal",
+  "blurb": "Wave-patterned squares of the Baixa climb past the cathedral into the tiled, steep lanes of Alfama and its sunset lookout.",
+  "waypoints": [
+   [
+    -9.137941,
+    38.714024
+   ],
+   [
+    -9.1328,
+    38.709818
+   ],
+   [
+    -9.13013,
+    38.711738
+   ],
+   [
+    -9.133483,
+    38.713926
+   ]
+  ]
+ },
+ {
+  "id": "madrid-gran-via-puerta-del-sol",
+  "name": "Gran Via to Puerta del Sol and Plaza Mayor",
+  "category": "city",
+  "region": "Europe",
+  "place": "Madrid, Spain",
+  "blurb": "Belle Epoque facades line Gran Via as the walk runs through the bustling Puerta del Sol and on to the arcaded Plaza Mayor.",
+  "waypoints": [
+   [
+    -3.710881,
+    40.423449
+   ],
+   [
+    -3.708713,
+    40.42204
+   ],
+   [
+    -3.703876,
+    40.416863
+   ],
+   [
+    -3.707397,
+    40.415393
+   ],
+   [
+    -3.7103999,
+    40.4152218
+   ]
+  ]
+ },
+ {
+  "id": "budapest-danube-parliament-arpad-bridge",
+  "name": "Danube Promenade from Parliament to Arpad Bridge",
+  "category": "city",
+  "region": "Europe",
+  "place": "Budapest, Hungary",
+  "blurb": "The Pest riverside promenade runs north from the neo-Gothic Parliament past Margaret Bridge, with Buda's hills in view across the Danube.",
+  "waypoints": [
+   [
+    19.0459186,
+    47.5070496
+   ],
+   [
+    19.0457585,
+    47.5140044
+   ],
+   [
+    19.042185,
+    47.5401682
+   ]
+  ]
+ },
+ {
+  "id": "edinburgh-royal-mile",
+  "name": "The Royal Mile",
+  "category": "city",
+  "region": "Europe",
+  "place": "Edinburgh, Scotland",
+  "blurb": "The cobbled spine of the Old Town runs from the castle on its volcanic rock down to the palace at Holyrood.",
+  "waypoints": [
+   [
+    -3.199,
+    55.94915
+   ],
+   [
+    -3.190852,
+    55.949479
+   ],
+   [
+    -3.179947,
+    55.951478
+   ],
+   [
+    -3.171613,
+    55.952695
+   ]
+  ]
+ },
+ {
+  "id": "dublin-grafton-street-temple-bar",
+  "name": "Grafton Street to Temple Bar",
+  "category": "city",
+  "region": "Europe",
+  "place": "Dublin, Ireland",
+  "blurb": "Shoppers and buskers fill Grafton Street, then the walk passes Trinity College and crosses the Ha'penny Bridge into lively Temple Bar.",
+  "waypoints": [
+   [
+    -6.259198,
+    53.343968
+   ],
+   [
+    -6.254428,
+    53.343706
+   ],
+   [
+    -6.263095,
+    53.346327
+   ],
+   [
+    -6.263114,
+    53.345496
+   ]
+  ]
+ },
+ {
+  "id": "copenhagen-stroget-nyhavn",
+  "name": "Strøget to Nyhavn",
+  "category": "city",
+  "region": "Europe",
+  "place": "Copenhagen, Denmark",
+  "blurb": "The pedestrian Strøget shopping street runs from the City Hall Square to the colourful waterfront houses of Nyhavn.",
+  "waypoints": [
+   [
+    12.568909,
+    55.676062
+   ],
+   [
+    12.579001,
+    55.678794
+   ],
+   [
+    12.585963,
+    55.680419
+   ],
+   [
+    12.590886,
+    55.679736
+   ]
+  ]
+ },
+ {
+  "id": "athens-syntagma-plaka-acropolis",
+  "name": "Syntagma to Plaka and the Acropolis",
+  "category": "city",
+  "region": "Europe",
+  "place": "Athens, Greece",
+  "blurb": "From Syntagma Square through the bazaar of Monastiraki and the whitewashed lanes of Plaka, the walk climbs toward the Parthenon.",
+  "waypoints": [
+   [
+    23.7349503,
+    37.9755158
+   ],
+   [
+    23.725947,
+    37.976361
+   ],
+   [
+    23.720842,
+    37.976828
+   ],
+   [
+    23.7263197,
+    37.9716894
+   ]
+  ]
+ },
+ {
+  "id": "seville-plaza-de-espana-cathedral-setas",
+  "name": "Plaza de Espana to the Cathedral and Las Setas",
+  "category": "city",
+  "region": "Europe",
+  "place": "Seville, Spain",
+  "blurb": "Tiled arches of the Plaza de Espana lead past the Alcazar gardens to the Gothic cathedral and the wooden mushrooms of Las Setas.",
+  "waypoints": [
+   [
+    -5.98694,
+    37.376974
+   ],
+   [
+    -5.993141,
+    37.385915
+   ],
+   [
+    -5.991853,
+    37.393119
+   ]
+  ]
+ }
+]

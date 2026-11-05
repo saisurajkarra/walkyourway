@@ -5,7 +5,8 @@ import type { CameraPose, ViewEngine } from './types';
 /**
  * REAL VIEW: eye-level walking through real 360° street photography, rendered by our own WebGL engine.
  * Sources: Google Street View imagery (official Map Tiles API, needs a key) or, with no key at all,
- * Panoramax - the open, free street-level photo commons (6K 360° photos, each with GPS + compass + time).
+ * the free photo commons: Mapillary (worldwide, 360° and regular photos, free client token) and Panoramax
+ * (open, 6K 360° photos). Every photo carries GPS + compass + capture time, like a Kinomap telemetry track.
  *
  * How the motion stays smooth like a video instead of jumping between photos:
  * each pixel's view ray is cast against a simple "street canyon" proxy (ground plane + building walls
@@ -15,12 +16,15 @@ import type { CameraPose, ViewEngine } from './types';
  */
 const API = 'https://tile.googleapis.com/v1';
 const PMX = 'https://api.panoramax.xyz/api';
+const MLY = 'https://graph.mapillary.com/images';
+const MLY_FIELDS = 'id,computed_geometry,geometry,computed_compass_angle,compass_angle,is_pano,camera_type,camera_parameters,width,height,thumb_2048_url,thumb_original_url,captured_at,sequence,creator';
 
 interface Pano {
   id: string; p: LngLat; xy: [number, number]; heading: number;
   w: number; h: number; tw: number; th: number; copyright: string; date: string;
   tex: THREE.CanvasTexture | null; zoom: number; loading: boolean; lastUsed: number;
   src?: { sd: string; hd: string }; // Panoramax: whole 360° images instead of tiles
+  flat?: { tanH: number; aspect: number }; // regular (non-360°) photo with its camera's field of view
   seq?: string; // capture sequence (one person's walk): staying on it keeps time & light consistent
 }
 
@@ -34,13 +38,14 @@ precision highp float;
 uniform sampler2D t0, t1, t2;
 uniform vec2 p0, p1, p2;
 uniform vec3 hd, w;
+uniform vec3 pj, th, ar; // projection (0 = 360°, 1 = flat photo), tan(half horizontal FOV), aspect w/h
 uniform vec3 cam, fwd, right, up;
 uniform vec2 tanH;
 uniform float gnd, rad;
 in vec2 vNdc;
 out vec4 frag;
 const float PI = 3.14159265359;
-vec3 samplePano(sampler2D t, vec2 pp, float heading, vec3 dir) {
+vec4 samplePano(sampler2D t, vec2 pp, float heading, float proj, float tanh, float asp, vec3 dir) {
   vec3 o = vec3(cam.xy - pp, cam.z);
   float tG = dir.z < -1e-3 ? (-gnd - o.z) / dir.z : 1e6;
   float R = max(rad, length(o.xy) + 4.0); // the camera must always be inside the proxy
@@ -51,17 +56,25 @@ vec3 samplePano(sampler2D t, vec2 pp, float heading, vec3 dir) {
   // tall facades / sky: fade to "far away" so rooftops and sky don't stretch
   vec3 d = normalize(mix(normalize(hit), dir, tt == tC ? smoothstep(10.0, 26.0, hit.z) : 0.0));
   float az = atan(d.x, d.y) - heading;
-  float u = fract(0.5 + az / (2.0 * PI));
-  float v = 0.5 - asin(clamp(d.z, -1.0, 1.0)) / PI;
-  return texture(t, vec2(u, v)).rgb;
+  if (proj < 0.5) {
+    float u = fract(0.5 + az / (2.0 * PI));
+    float v = 0.5 - asin(clamp(d.z, -1.0, 1.0)) / PI;
+    return vec4(texture(t, vec2(u, v)).rgb, 1.0);
+  }
+  // flat photo: pinhole projection; outside its frame the edge is stretched and dimmed, never black
+  float fx = max(cos(az) * length(d.xy), 0.02), rx = sin(az) * length(d.xy);
+  vec2 uv = vec2(0.5 + rx / fx / (2.0 * tanh), 0.5 - d.z / fx / (2.0 * tanh / asp));
+  float edge = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
+  float a = mix(0.12, 1.0, smoothstep(-0.02, 0.03, edge));
+  return vec4(texture(t, clamp(uv, 0.0, 1.0)).rgb * mix(0.45, 1.0, a), a);
 }
 void main() {
   vec3 dir = normalize(fwd + vNdc.x * tanH.x * right + vNdc.y * tanH.y * up);
   vec3 col = vec3(0.0);
   float ws = 0.0;
-  if (w.x > 0.001) { col += w.x * samplePano(t0, p0, hd.x, dir); ws += w.x; }
-  if (w.y > 0.001) { col += w.y * samplePano(t1, p1, hd.y, dir); ws += w.y; }
-  if (w.z > 0.001) { col += w.z * samplePano(t2, p2, hd.z, dir); ws += w.z; }
+  if (w.x > 0.001) { vec4 c = samplePano(t0, p0, hd.x, pj.x, th.x, ar.x, dir); col += w.x * c.a * c.rgb; ws += w.x * c.a; }
+  if (w.y > 0.001) { vec4 c = samplePano(t1, p1, hd.y, pj.y, th.y, ar.y, dir); col += w.y * c.a * c.rgb; ws += w.y * c.a; }
+  if (w.z > 0.001) { vec4 c = samplePano(t2, p2, hd.z, pj.z, th.z, ar.z, dir); col += w.z * c.a * c.rgb; ws += w.z * c.a; }
   frag = vec4(ws > 0.0 ? col / ws : vec3(0.05, 0.07, 0.1), 1.0);
 }`;
 
@@ -91,7 +104,7 @@ export class StreetEngine implements ViewEngine {
   private fade = 1;
 
   private source: 'google' | 'panoramax';
-  constructor(private key: string, private wallRadius: number) { this.source = key ? 'google' : 'panoramax'; }
+  constructor(private key: string, private mly: string, private wallRadius: number) { this.source = key ? 'google' : 'panoramax'; }
 
   private q(extra = '') { return `session=${this.session}&key=${this.key}${extra}`; }
 
@@ -124,6 +137,7 @@ export class StreetEngine implements ViewEngine {
         t0: { value: this.blank }, t1: { value: this.blank }, t2: { value: this.blank },
         p0: { value: new THREE.Vector2() }, p1: { value: new THREE.Vector2() }, p2: { value: new THREE.Vector2() },
         hd: { value: new THREE.Vector3() }, w: { value: new THREE.Vector3() },
+        pj: { value: new THREE.Vector3() }, th: { value: new THREE.Vector3(1, 1, 1) }, ar: { value: new THREE.Vector3(1, 1, 1) },
         cam: { value: new THREE.Vector3() }, fwd: { value: new THREE.Vector3() }, right: { value: new THREE.Vector3() }, up: { value: new THREE.Vector3() },
         tanH: { value: new THREE.Vector2() }, gnd: { value: this.source === 'google' ? 2.5 : 2.2 }, rad: { value: this.wallRadius },
       },
@@ -143,7 +157,44 @@ export class StreetEngine implements ViewEngine {
 
   /** Finds photos near points (and their metadata). Returns IDs nearest-first. */
   private async lookup(points: LngLat[], radius = 20): Promise<string[]> {
-    return this.source === 'google' ? this.lookupGoogle(points, radius) : this.lookupPanoramax(points, radius);
+    if (this.source === 'google') return this.lookupGoogle(points, radius);
+    const [a, b] = await Promise.all([this.mly ? this.lookupMapillary(points, radius) : [], this.lookupPanoramax(points, radius)]);
+    const ids = [...new Set([...a, ...b])];
+    const d = (id: string) => Math.min(...points.map((q) => Math.hypot(...toENU(this.panos.get(id)!.p, q))));
+    return ids.sort((x, y) => d(x) - d(y));
+  }
+
+  private bbox(points: LngLat[], radius: number) {
+    const dLat = radius / 110540, dLng = radius / (111320 * Math.cos((points[0][1] * Math.PI) / 180));
+    const lngs = points.map((p) => p[0]), lats = points.map((p) => p[1]);
+    return [Math.min(...lngs) - dLng, Math.min(...lats) - dLat, Math.max(...lngs) + dLng, Math.max(...lats) + dLat].map((v) => v.toFixed(6)).join(',');
+  }
+
+  private async lookupMapillary(points: LngLat[], radius: number): Promise<string[]> {
+    this.lookups++;
+    try {
+      const r = await fetch(`${MLY}?access_token=${encodeURIComponent(this.mly)}&fields=${MLY_FIELDS}&bbox=${this.bbox(points, radius)}&limit=200`);
+      if (!r.ok) return [];
+      const ids: string[] = [];
+      for (const f of (await r.json()).data || []) {
+        if (f.camera_type === 'fisheye' || !f.thumb_2048_url) continue;
+        const id = 'mly:' + f.id;
+        if (!this.panos.has(id)) {
+          const p: LngLat = (f.computed_geometry || f.geometry).coordinates;
+          const pano = !!f.is_pano || f.camera_type === 'spherical' || f.camera_type === 'equirectangular';
+          const w = f.width || 4, h = f.height || 3, focal = (f.camera_parameters || [])[0] || 0.85;
+          this.panos.set(id, {
+            id, p, xy: toENU(p, this.origin), heading: (((f.computed_compass_angle ?? f.compass_angle) || 0) * Math.PI) / 180,
+            w, h, tw: 0, th: 0, copyright: `Mapillary · ${f.creator?.username || 'contributor'} · CC BY-SA`,
+            date: f.captured_at ? new Date(f.captured_at).toISOString().slice(0, 7) : '', tex: null, zoom: -1, loading: false, lastUsed: 0,
+            src: { sd: f.thumb_2048_url, hd: (pano && f.thumb_original_url) || f.thumb_2048_url }, seq: f.sequence,
+            flat: pano ? undefined : { tanH: w >= h ? 0.5 / focal : (0.5 / focal) * (w / h), aspect: w / h },
+          });
+        }
+        ids.push(id);
+      }
+      return ids;
+    } catch { return []; } finally { this.lookups--; }
   }
 
   private async lookupPanoramax(points: LngLat[], radius: number): Promise<string[]> {
@@ -255,7 +306,7 @@ export class StreetEngine implements ViewEngine {
       const r = await fetch(z >= 3 ? p.src!.hd : p.src!.sd);
       if (!r.ok) return;
       const bmp = await createImageBitmap(await r.blob());
-      const W = Math.min(z >= 3 ? 4096 : 2048, bmp.width), H = Math.round(W / 2);
+      const W = Math.min(z >= 3 ? 4096 : 2048, bmp.width), H = Math.round((W * bmp.height) / bmp.width);
       const cv = document.createElement('canvas');
       cv.width = W; cv.height = H;
       cv.getContext('2d')!.drawImage(bmp, 0, 0, W, H);
@@ -304,7 +355,8 @@ export class StreetEngine implements ViewEngine {
     if (!loaded.length) loaded = near.filter((n) => n.p.tex).slice(0, 1); // before the first photo: show the nearest, never black
     if (loaded.length) {
       const cur = this.cur, curD = cur ? Math.hypot(cur.xy[0] - cx, cur.xy[1] - cy) : Infinity;
-      const score = (n: { p: Pano; d: number }) => n.d + (cur?.seq && n.p.seq && n.p.seq !== cur.seq ? 6 : 0);
+      const score = (n: { p: Pano; d: number }) => n.d + (cur?.seq && n.p.seq && n.p.seq !== cur.seq ? 6 : 0)
+        + (n.p.flat ? 3 + Math.max(0, Math.abs(angDiff(pose.heading, (n.p.heading * 180) / Math.PI)) - 25) / 8 : 0);
       const best = loaded.reduce((b, n) => (score(n) < score(b) ? n : b));
       if (!cur || !cur.tex || (best.p !== cur && score(best) < curD - 1)) { this.prev = cur?.tex ? cur : null; this.cur = best.p; this.fade = this.prev ? 0 : 1; }
     }
@@ -321,6 +373,9 @@ export class StreetEngine implements ViewEngine {
       U[`t${i}`].value = p.tex;
       (U[`p${i}`].value as THREE.Vector2).set(p.xy[0], p.xy[1]);
       (U.hd.value as THREE.Vector3).setComponent(i, p.heading);
+      (U.pj.value as THREE.Vector3).setComponent(i, p.flat ? 1 : 0);
+      (U.th.value as THREE.Vector3).setComponent(i, p.flat?.tanH ?? 1);
+      (U.ar.value as THREE.Vector3).setComponent(i, p.flat?.aspect ?? 1);
       wv[i] = i === 0 ? this.fade : 1 - this.fade;
     });
     const sum = wv[0] + wv[1] + wv[2] || 1;
@@ -347,9 +402,14 @@ export class StreetEngine implements ViewEngine {
   coverage() { return this.covered; }
 
   /** Cheap check used while on a fallback view: are real 360° photos close to `p`? */
-  static async available(p: LngLat, key: string, radius = 40): Promise<boolean> {
+  static async available(p: LngLat, key: string, mly: string, radius = 40): Promise<boolean> {
     if (key) return false; // Google: handled by the engine itself (needs a session)
     try {
+      if (mly) {
+        const dLat0 = radius / 110540, dLng0 = radius / (111320 * Math.cos((p[1] * Math.PI) / 180));
+        const m = await fetch(`${MLY}?access_token=${encodeURIComponent(mly)}&fields=id,camera_type&bbox=${[p[0] - dLng0, p[1] - dLat0, p[0] + dLng0, p[1] + dLat0].map((v) => v.toFixed(6)).join(',')}&limit=5`);
+        if (m.ok && ((await m.json()).data || []).some((f: { camera_type?: string }) => f.camera_type !== 'fisheye')) return true;
+      }
       const dLat = radius / 110540, dLng = radius / (111320 * Math.cos((p[1] * Math.PI) / 180));
       const r = await fetch(`${PMX}/search?bbox=${[p[0] - dLng, p[1] - dLat, p[0] + dLng, p[1] + dLat].map((v) => v.toFixed(6)).join(',')}&limit=40`);
       const j = await r.json();
