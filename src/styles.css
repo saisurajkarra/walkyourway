@@ -140,3 +140,6 @@ dialog label input, dialog label select { margin-top: 4px; }
 .vwalk .hud-bottom { background: linear-gradient(180deg, transparent, rgba(0,0,0,.8) 25%); }
 #b-sync { font-variant-numeric: tabular-nums; }
 @media (orientation: portrait) { .vstage { align-items: flex-start; padding-top: calc(var(--st) + 130px); } }
+
+.sec { font-size: 15px; margin: 18px 0 8px; } .sec small { color: var(--muted); font-weight: 400; margin-left: 6px; }
+.card.scan { border-color: rgba(56,189,248,.55); box-shadow: 0 0 0 1px rgba(56,189,248,.25) inset; }

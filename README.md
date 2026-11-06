@@ -99,6 +99,10 @@ Code map: `src/walker.ts` (movement, junction decisions, 24 m path prediction), 
 | Landmarks | Wikipedia GeoSearch | no |
 | Place search | Nominatim (OpenStreetMap) | no |
 
+## 3D scans (experimental, off by default)
+
+`scripts/scan/build_scan.py` rebuilds a real street in 3D from open Mapillary photos (their solved camera poses, a depth network for dense depth, fused into a coloured point set), and `src/engines/scan.ts` renders it with free look. Both work end to end (75 photos become 2.9 M points in about 90 s on a CPU), but the result is **not photoreal**: crowd-sourced phone photos barely capture the road, depth from single photos is noisy, and points turn into blobs up close. No scan is shipped; add one to `src/data/scans.json` and `public/scans/<id>/` to enable the engine. Photoreal true-place 3D needs purpose-captured footage and Gaussian-splat training on a GPU.
+
 ## Roadmap
 
 - **Treadmill / heart rate over Bluetooth (FTMS):** works in Chrome on Android and desktop. iOS Safari has no Web Bluetooth.

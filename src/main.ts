@@ -5,6 +5,7 @@ import { Walker, type Junction } from './walker';
 import { Landmarks, drawMinimap } from './extras';
 import type { ViewEngine } from './engines/types';
 import { VIDEOS, startVideoWalk } from './video';
+import { scanAt, SCAN_META, type ScanMeta } from './scans';
 import {
   ROUTES, REGIONS, VIEWS, settings, saveSettings, history, saveWalk, keys, availableEngines, ENGINE_LABEL, thumb, type EngineKind,
   fmtSpeed, speedUnit, fmtDist, fmtTime, fmtPace, paceUnit, kcalPerSec, strideM, type Route,
@@ -18,6 +19,15 @@ const clampSpeed = (v: number) => Math.round(Math.max(0.5, Math.min(20, v)) * 10
 const stepSpeed = (dir: number) => { settings.speedKmh = clampSpeed(settings.speedKmh + dir * (settings.units === 'metric' ? 0.1 : 0.1609344)); saveSettings(); };
 
 // ======================= HOME =======================
+/** A scanned street as a walkable route: the path the photographers walked, inside the 3D model. */
+const scanRoute = (s: ScanMeta): Route => {
+  const coords = s.path.map((q) => [q[0], q[1]] as LngLat);
+  let m = 0; for (let i = 1; i < coords.length; i++) m += dist(coords[i - 1], coords[i]);
+  return { id: 'scan:' + s.id, name: s.title, category: 'city', region: s.region, place: s.place, blurb: s.blurb, distanceKm: m / 1000, coords };
+};
+const SCAN_ROUTES = SCAN_META.map(scanRoute);
+const openScan = (r: Route) => startWalk(r.name, r.coords[0], r);
+
 let filter: 'all' | Route['category'] = 'all';
 let region = 'all';
 let query = '';
@@ -68,6 +78,7 @@ function home() {
     <nav class="chips" id="cats">
       ${(['all', 'city', 'hike', 'scenic'] as const).map((c) => `<button data-f="${c}" class="${filter === c ? 'on' : ''}">${c === 'all' ? 'All types' : `${CAT[c].icon} ${CAT[c].name}`}</button>`).join('')}
     </nav>
+    ${SCAN_ROUTES.length && !query ? `<h2 class="sec">🧊 Real 3D scans <small>walk inside, look anywhere</small></h2><section class="cards" id="scans">${SCAN_ROUTES.map((r) => `<button class="card scan" data-id="${r.id}"><img loading="lazy" alt="" src="${thumb(r.coords[Math.floor(r.coords.length / 2)], 17)}"><span class="badge">🧊 3D scan · ${fmtDist(r.distanceKm * 1000)}</span><span class="name">${esc(r.name)}</span><span class="place">${esc(r.place)}</span><span class="blurb">${esc(r.blurb)}</span></button>`).join('')}</section><h2 class="sec">🎞️ Filmed walks</h2>` : ''}
     <section class="cards" id="cards">${cardsHtml()}</section>
     ${history.length ? `<section class="hist"><h2>Your walks · ${fmtDist(totalKm * 1000)} total</h2>${history.slice(0, 8).map((h) => `<div class="row"><span>${esc(h.name)}</span><span>${fmtDist(h.km * 1000)} · ${fmtTime(h.sec)}</span></div>`).join('')}</section>` : ''}
     <footer>Tip: on iPhone tap Share → <b>Add to Home Screen</b> for full-screen walking.</footer>
@@ -84,6 +95,11 @@ function home() {
     if (v) void startVideoWalk(app, r, v, home, (pos) => startWalk(r.name, pos, null));
     else startWalk(r.name, r.coords[0], r);
   };
+  $('#scans')?.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('.card');
+    const r = SCAN_ROUTES.find((x) => x.id === b?.dataset.id);
+    if (r) openScan(r);
+  });
   const qi = $<HTMLInputElement>('#q');
   qi.oninput = () => { query = qi.value; $('#cards').innerHTML = cardsHtml(); };
   $<HTMLFormElement>('#f-search').onsubmit = async (e) => {
@@ -109,7 +125,7 @@ function openSettings() {
     <label>Units <select name="units"><option value="metric">km, km/h</option><option value="imperial">miles, mph</option></select></label>
     <label>Weight (kg) <input name="weightKg" type="number" min="25" max="250" inputmode="decimal"></label>
     <label>Height (cm) <input name="heightCm" type="number" min="100" max="230" inputmode="decimal"></label>
-    <label>View <select name="engine"><option value="auto">Auto (best available)</option><option value="street">📷 Real View: eye-level 360° photos</option><option value="photoreal">🌐 3D World: photoreal 3D</option><option value="terrain">🛰️ Satellite preview</option></select></label>
+    <label>View <select name="engine"><option value="auto">Auto (best available)</option><option value="scan">🧊 3D Scan: real streets rebuilt in 3D</option><option value="street">📷 Real View: eye-level 360° photos</option><option value="photoreal">🌐 3D World: photoreal 3D</option><option value="terrain">🛰️ Satellite preview</option></select></label>
     <h3>Real imagery keys</h3>
     <p class="muted"><b>Google Maps key</b> with “Map Tiles API” enabled unlocks both 📷 Real View (Street View photos at eye level) and 🌐 3D World (Google Photorealistic 3D Tiles). A <b>Cesium ion token</b> unlocks 3D World only. Stored on this device.</p>
     <label>Google Maps API key<input name="googleKey" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
@@ -149,7 +165,8 @@ async function makeEngine(want: EngineKind, el: HTMLElement, start: LngLat, cat:
     try {
       el.innerHTML = '';
       let e: ViewEngine;
-      if (kind === 'street') e = new (await import('./engines/street')).StreetEngine(k.google, k.mapillary, WALL[cat]);
+      if (kind === 'scan') e = new (await import('./engines/scan')).ScanEngine();
+      else if (kind === 'street') e = new (await import('./engines/street')).StreetEngine(k.google, k.mapillary, WALL[cat]);
       else if (kind === 'photoreal') e = new (await import('./engines/photoreal')).PhotorealEngine(k.google, k.ion);
       else e = new (await import('./engines/terrain')).TerrainEngine();
       await e.init(el, start);
@@ -221,7 +238,8 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
 
   // ---- engine (swappable mid-walk) ----
   let engine: ViewEngine | null = null;
-  let kind: EngineKind = settings.engine === 'auto' ? availableEngines()[0] : settings.engine;
+  const wantScan = settings.engine === 'auto' || settings.engine === 'scan';
+  let kind: EngineKind = wantScan && scanAt(start, 120) ? 'scan' : settings.engine === 'auto' ? (availableEngines().find((k) => k !== 'scan') ?? 'terrain') : settings.engine;
   let viewIdx = 1, quality = 2, swapping = false;
   const setButtons = () => {
     $('#b-world').textContent = ENGINE_LABEL[kind];
@@ -406,7 +424,7 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
   };
 
   // ---- main loop ----
-  let lastT = performance.now(), veilDone = false, fps = 60, lastQ = performance.now(), noCover = 0, lastProbe = performance.now(), probing = false;
+  let lastT = performance.now(), veilDone = false, fps = 60, lastQ = performance.now(), noCover = 0, lastProbe = performance.now(), probing = false, lastScan = performance.now();
   const wantStreet = (settings.engine === 'auto' || settings.engine === 'street') && !keys().google;
   const veilStart = performance.now();
   const frame = (t: number) => {
@@ -428,8 +446,13 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
       // Real View: leave streets without photos gracefully
       if (engine.coverage && playing) {
         noCover = engine.coverage() ? 0 : noCover + dt;
-        if (noCover > 4) { noCover = 0; const alt = availableEngines().find((k) => k !== 'street')!; toast(`No street photos here. Switching to ${ENGINE_LABEL[alt]}; tap 📷 to return.`); void swap(alt, cam); }
+        if (noCover > 4) { noCover = 0; const alt = availableEngines().find((k) => k !== kind && k !== 'scan' && k !== 'street') ?? 'terrain'; toast(`No street photos here. Switching to ${ENGINE_LABEL[alt]}; tap 📷 to return.`); void swap(alt, cam); }
       }
+    }
+    // walked into a real 3D scan: step inside it
+    if (wantScan && kind !== 'scan' && !swapping && t - lastScan > 6000) {
+      lastScan = t;
+      if (scanAt(cam, 18)) { toast('🧊 Real 3D scan of this street. Look anywhere.'); void swap('scan', cam); }
     }
     // walked back into street-photo coverage while on a fallback view: return to Real View
     if (wantStreet && kind !== 'street' && !swapping && !probing && t - lastProbe > 12000) {
@@ -459,8 +482,9 @@ async function startWalk(title: string, start: LngLat, route: Route | null) {
 }
 
 // Shareable deep links: #walk=<route id> opens the filmed walk, add &mode=3d for the explorable 3D walk.
-const deep = new URLSearchParams(location.hash.slice(1)), deepRoute = ROUTES.find((r) => r.id === deep.get('walk'));
-if (deepRoute) {
+const deep = new URLSearchParams(location.hash.slice(1)), deepRoute = ROUTES.find((r) => r.id === deep.get('walk')), deepScan = SCAN_ROUTES.find((r) => r.id === 'scan:' + deep.get('scan'));
+if (deepScan) openScan(deepScan);
+else if (deepRoute) {
   const v = VIDEOS.get(deepRoute.id);
   if (v && deep.get('mode') !== '3d') void startVideoWalk(app, deepRoute, v, home, (pos) => startWalk(deepRoute.name, pos, null));
   else startWalk(deepRoute.name, deepRoute.coords[0], deepRoute);

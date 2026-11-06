@@ -1,4 +1,5 @@
 import type { LngLat } from './geo';
+import { hasScans } from './scans';
 
 export interface Route { id: string; name: string; category: 'city' | 'hike' | 'scenic'; region: string; place: string; blurb: string; distanceKm: number; coords: LngLat[] }
 
@@ -24,7 +25,7 @@ export interface Settings {
   speedKmh: number;
   weightKg: number;
   heightCm: number;
-  engine: 'auto' | 'street' | 'photoreal' | 'terrain';
+  engine: 'auto' | 'scan' | 'street' | 'photoreal' | 'terrain';
   googleKey: string;
   ionToken: string;
   mapillaryToken: string;
@@ -50,14 +51,14 @@ export const keys = () => ({
   // Mapillary *client* token (public by design). Set the MAPILLARY_TOKEN repo secret; never use the client secret.
   mapillary: (settings.mapillaryToken || '').trim() || (import.meta.env.VITE_MAPILLARY_TOKEN as string | undefined) || '',
 });
-export type EngineKind = 'street' | 'photoreal' | 'terrain';
+export type EngineKind = 'scan' | 'street' | 'photoreal' | 'terrain';
 /** Engines usable with the configured keys, best first. */
 export const availableEngines = (): EngineKind[] => {
   const k = keys();
   // Real View always: Google Street View with a key, otherwise free Panoramax photos (falls back if none nearby)
-  return ['street', ...(k.google || k.ion ? ['photoreal' as const] : []), 'terrain'];
+  return [...(hasScans() ? ['scan' as const] : []), 'street', ...(k.google || k.ion ? ['photoreal' as const] : []), 'terrain'];
 };
-export const ENGINE_LABEL: Record<EngineKind, string> = { street: '📷 Real View', photoreal: '🌐 3D World', terrain: '🛰️ Satellite' };
+export const ENGINE_LABEL: Record<EngineKind, string> = { scan: '🧊 3D Scan', street: '📷 Real View', photoreal: '🌐 3D World', terrain: '🛰️ Satellite' };
 
 // ---------- formatting ----------
 const MI = 1.609344;
